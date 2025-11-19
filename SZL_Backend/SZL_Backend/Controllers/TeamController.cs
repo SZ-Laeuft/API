@@ -4,7 +4,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SZL_Backend.Context;
+//using SZL_Backend.Context;
 
 namespace SZL_Backend.Controllers
 {
@@ -76,7 +76,7 @@ namespace SZL_Backend.Controllers
                     FROM public.rounds
                     WHERE uid = @uid
                 )
-                SELECT 
+                SELECT
                     t1.scantime - t2.scantime AS laptime
                 FROM last_two_rounds t1
                 JOIN last_two_rounds t2 ON t1.rn = 1 AND t2.rn = 2;
@@ -93,7 +93,7 @@ namespace SZL_Backend.Controllers
                             if (result != null && result != DBNull.Value)
                             {
                                 var laptime = (TimeSpan)result;
-                                string formattedLapTime = laptime.ToString(@"hh\:mm\:ss"); 
+                                string formattedLapTime = laptime.ToString(@"hh\:mm\:ss");
                                 return Ok(formattedLapTime);
                             }
                             return NotFound("Not enough rounds to calculate lap time.");
@@ -111,64 +111,4 @@ namespace SZL_Backend.Controllers
             }
         }
 */
-        /// <summary>
-        /// Retrieves the count of rounds for a given user Uid.
-        /// </summary>
-        /// <param name="Uid">The Uid of the user whose rounds count you want to retrieve.</param>
-        /// <returns>Returns the count of rounds for the specified user Uid or an error message if no rounds exist.</returns>
-        [HttpGet("RoundsCount/{Uid}")]
-        [SwaggerOperation(
-            Summary = "Get the rounds count for a given user Uid",
-            Description = "Fetches the total number of rounds for a specific user Uid."
-        )]
-        [SwaggerResponse(200, "Rounds count successfully retrieved.", typeof(object))]
-        [SwaggerResponse(404, "No rounds found for the given user Uid.")]
-        [SwaggerResponse(500, "Internal Server Error - Database issue or unexpected error.")]
-        public async Task<IActionResult> GetRoundsCountByUid(decimal Uid)
-        {
-            try
-            {
-                // Dependency Injection ASP.NET mit DBContext
-                using (var context = new MyDbContext())
-                {
-                    var rounds = from t in context.Tags
-                        where t.Uid == Uid
-                        select t.Runners.First().Rounds.Count;
-                    context.Rounds.Add();
-                    context.SaveChanges();
-                }
-
-                using (var connection = new NpgsqlConnection(ConnectionString.connectionstring))
-                {
-                    await connection.OpenAsync();
-                    var query = "SELECT COUNT(*) AS RoundsCount FROM Rounds WHERE Uid = @Uid";
-                    
-                    using (var command = new NpgsqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Uid", Uid);
-
-                        var roundsCount = await command.ExecuteScalarAsync();
-
-                        if (roundsCount != null && Convert.ToInt32(roundsCount) > 0)
-                        {
-                            return Ok(new { RoundsCount = roundsCount });
-                        }
-                        else
-                        {
-                            return NotFound($"No entries found for Uid {Uid}.");
-                        }
-                    }
-                }
-            }
-            catch (NpgsqlException ex)
-            {
-                return StatusCode(500, $"Database error: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
-            }
-        }
-    }
-    
 }

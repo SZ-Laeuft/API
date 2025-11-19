@@ -11,11 +11,15 @@ public partial class Event
 
     public string? Place { get; set; }
 
+    public string? Isactive { get; set; }
+
     public DateTime? Starttime { get; set; }
 
     public DateTime? Endtime { get; set; }
 
-    public string? Isactive { get; set; }
+    public int? Categoryid { get; set; }
 
-    public virtual ICollection<Runner> Runners { get; set; } = new List<Runner>();
+    public virtual Category? Category { get; set; }
+
+    public virtual ICollection<Participate> Participates { get; set; } = new List<Participate>();
 }

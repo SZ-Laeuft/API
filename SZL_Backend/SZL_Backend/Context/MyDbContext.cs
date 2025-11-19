@@ -16,11 +16,15 @@ public partial class MyDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Category> Categories { get; set; }
+
     public virtual DbSet<Donation> Donations { get; set; }
 
     public virtual DbSet<Event> Events { get; set; }
 
     public virtual DbSet<Gift> Gifts { get; set; }
+
+    public virtual DbSet<Participate> Participates { get; set; }
 
     public virtual DbSet<Round> Rounds { get; set; }
 
@@ -36,6 +40,18 @@ public partial class MyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.HasKey(e => e.Categoryid).HasName("category_pkey");
+
+            entity.ToTable("category");
+
+            entity.Property(e => e.Categoryid).HasColumnName("categoryid");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .HasColumnName("name");
+        });
+
         modelBuilder.Entity<Donation>(entity =>
         {
             entity.HasKey(e => e.Donationid).HasName("donations_pkey");
@@ -43,14 +59,12 @@ public partial class MyDbContext : DbContext
             entity.ToTable("donations");
 
             entity.Property(e => e.Donationid).HasColumnName("donationid");
-            entity.Property(e => e.Amount)
-                .HasPrecision(7, 2)
-                .HasColumnName("amount");
-            entity.Property(e => e.Runnerid).HasColumnName("runnerid");
+            entity.Property(e => e.Amount).HasColumnName("amount");
+            entity.Property(e => e.Participateid).HasColumnName("participateid");
 
-            entity.HasOne(d => d.Runner).WithMany(p => p.Donations)
-                .HasForeignKey(d => d.Runnerid)
-                .HasConstraintName("fk_runnerid_don");
+            entity.HasOne(d => d.Participate).WithMany(p => p.Donations)
+                .HasForeignKey(d => d.Participateid)
+                .HasConstraintName("fk_participateid_donations");
         });
 
         modelBuilder.Entity<Event>(entity =>
@@ -60,40 +74,26 @@ public partial class MyDbContext : DbContext
             entity.ToTable("event");
 
             entity.Property(e => e.Eventid).HasColumnName("eventid");
+            entity.Property(e => e.Categoryid).HasColumnName("categoryid");
             entity.Property(e => e.Endtime)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("endtime");
             entity.Property(e => e.Isactive)
-                .HasMaxLength(50)
+                .HasMaxLength(30)
                 .HasColumnName("isactive");
             entity.Property(e => e.Name)
-                .HasMaxLength(50)
+                .HasMaxLength(30)
                 .HasColumnName("name");
             entity.Property(e => e.Place)
-                .HasMaxLength(50)
+                .HasMaxLength(30)
                 .HasColumnName("place");
             entity.Property(e => e.Starttime)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("starttime");
 
-            entity.HasMany(d => d.Runners).WithMany(p => p.Events)
-                .UsingEntity<Dictionary<string, object>>(
-                    "Participate",
-                    r => r.HasOne<Runner>().WithMany()
-                        .HasForeignKey("Runnerid")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("fk_runnerid"),
-                    l => l.HasOne<Event>().WithMany()
-                        .HasForeignKey("Eventid")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("fk_eventid"),
-                    j =>
-                    {
-                        j.HasKey("Eventid", "Runnerid").HasName("takespart_pkey");
-                        j.ToTable("participate");
-                        j.IndexerProperty<int>("Eventid").HasColumnName("eventid");
-                        j.IndexerProperty<int>("Runnerid").HasColumnName("runnerid");
-                    });
+            entity.HasOne(d => d.Category).WithMany(p => p.Events)
+                .HasForeignKey(d => d.Categoryid)
+                .HasConstraintName("fk_category_event");
         });
 
         modelBuilder.Entity<Gift>(entity =>
@@ -103,27 +103,75 @@ public partial class MyDbContext : DbContext
             entity.ToTable("gifts");
 
             entity.Property(e => e.Giftid).HasColumnName("giftid");
-            entity.Property(e => e.Count).HasColumnName("count");
             entity.Property(e => e.Name)
-                .HasMaxLength(50)
+                .HasMaxLength(30)
                 .HasColumnName("name");
+            entity.Property(e => e.Requirement).HasColumnName("requirement");
+
+            entity.HasMany(d => d.Participates).WithMany(p => p.Gifts)
+                .UsingEntity<Dictionary<string, object>>(
+                    "Receife",
+                    r => r.HasOne<Participate>().WithMany()
+                        .HasForeignKey("Participateid")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("fk_participateid_receives"),
+                    l => l.HasOne<Gift>().WithMany()
+                        .HasForeignKey("Giftid")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("fk_giftid_receives"),
+                    j =>
+                    {
+                        j.HasKey("Giftid", "Participateid").HasName("receives_pkey");
+                        j.ToTable("receives");
+                        j.IndexerProperty<int>("Giftid").HasColumnName("giftid");
+                        j.IndexerProperty<int>("Participateid").HasColumnName("participateid");
+                    });
+        });
+
+        modelBuilder.Entity<Participate>(entity =>
+        {
+            entity.HasKey(e => e.Participateid).HasName("participate_pkey");
+
+            entity.ToTable("participate");
+
+            entity.Property(e => e.Participateid).HasColumnName("participateid");
+            entity.Property(e => e.Eventid).HasColumnName("eventid");
+            entity.Property(e => e.Runnerid).HasColumnName("runnerid");
+            entity.Property(e => e.Tagid).HasColumnName("tagid");
+            entity.Property(e => e.Teamid).HasColumnName("teamid");
+
+            entity.HasOne(d => d.Event).WithMany(p => p.Participates)
+                .HasForeignKey(d => d.Eventid)
+                .HasConstraintName("fk_eventid_participate");
+
+            entity.HasOne(d => d.Runner).WithMany(p => p.Participates)
+                .HasForeignKey(d => d.Runnerid)
+                .HasConstraintName("fk_runnerid_participate");
+
+            entity.HasOne(d => d.Tag).WithMany(p => p.Participates)
+                .HasForeignKey(d => d.Tagid)
+                .HasConstraintName("fk_tagid_participate");
+
+            entity.HasOne(d => d.Team).WithMany(p => p.Participates)
+                .HasForeignKey(d => d.Teamid)
+                .HasConstraintName("fk_teamid_participate");
         });
 
         modelBuilder.Entity<Round>(entity =>
         {
-            entity.HasKey(e => e.Roundsid).HasName("rounds_pkey");
+            entity.HasKey(e => e.Roundid).HasName("rounds_pkey");
 
             entity.ToTable("rounds");
 
-            entity.Property(e => e.Roundsid).HasColumnName("roundsid");
-            entity.Property(e => e.Runnerid).HasColumnName("runnerid");
-            entity.Property(e => e.Timestamp)
+            entity.Property(e => e.Roundid).HasColumnName("roundid");
+            entity.Property(e => e.Participateid).HasColumnName("participateid");
+            entity.Property(e => e.Roundtimestamp)
                 .HasColumnType("timestamp without time zone")
-                .HasColumnName("timestamp");
+                .HasColumnName("roundtimestamp");
 
-            entity.HasOne(d => d.Runner).WithMany(p => p.Rounds)
-                .HasForeignKey(d => d.Runnerid)
-                .HasConstraintName("fk_runnerid");
+            entity.HasOne(d => d.Participate).WithMany(p => p.Rounds)
+                .HasForeignKey(d => d.Participateid)
+                .HasConstraintName("fk_participateid_rounds");
         });
 
         modelBuilder.Entity<Runner>(entity =>
@@ -133,55 +181,23 @@ public partial class MyDbContext : DbContext
             entity.ToTable("runner");
 
             entity.Property(e => e.Runnerid).HasColumnName("runnerid");
-            entity.Property(e => e.Eventid).HasColumnName("eventid");
             entity.Property(e => e.Firstname)
-                .HasMaxLength(50)
+                .HasMaxLength(30)
                 .HasColumnName("firstname");
             entity.Property(e => e.Lastname)
-                .HasMaxLength(50)
+                .HasMaxLength(30)
                 .HasColumnName("lastname");
-            entity.Property(e => e.Teamid).HasColumnName("teamid");
-            entity.Property(e => e.Uid).HasColumnName("uid");
-
-            entity.HasOne(d => d.Team).WithMany(p => p.Runners)
-                .HasForeignKey(d => d.Teamid)
-                .HasConstraintName("fk_teamid");
-
-            entity.HasOne(d => d.UidNavigation).WithMany(p => p.Runners)
-                .HasForeignKey(d => d.Uid)
-                .HasConstraintName("fk_uid");
-
-            entity.HasMany(d => d.Gifts).WithMany(p => p.Runners)
-                .UsingEntity<Dictionary<string, object>>(
-                    "Receife",
-                    r => r.HasOne<Gift>().WithMany()
-                        .HasForeignKey("Giftid")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("fk_giftid_receive"),
-                    l => l.HasOne<Runner>().WithMany()
-                        .HasForeignKey("Runnerid")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("fk_runnerid_receive"),
-                    j =>
-                    {
-                        j.HasKey("Runnerid", "Giftid").HasName("receives_pkey");
-                        j.ToTable("receives");
-                        j.IndexerProperty<int>("Runnerid").HasColumnName("runnerid");
-                        j.IndexerProperty<int>("Giftid").HasColumnName("giftid");
-                    });
         });
 
         modelBuilder.Entity<Tag>(entity =>
         {
-            entity.HasKey(e => e.Uid).HasName("tag_pkey");
+            entity.HasKey(e => e.Tagid).HasName("tag_pkey");
 
             entity.ToTable("tag");
 
-            entity.Property(e => e.Uid)
-                .ValueGeneratedNever()
-                .HasColumnName("uid");
+            entity.Property(e => e.Tagid).HasColumnName("tagid");
             entity.Property(e => e.Status)
-                .HasMaxLength(50)
+                .HasMaxLength(30)
                 .HasColumnName("status");
         });
 
@@ -193,7 +209,7 @@ public partial class MyDbContext : DbContext
 
             entity.Property(e => e.Teamid).HasColumnName("teamid");
             entity.Property(e => e.Name)
-                .HasMaxLength(50)
+                .HasMaxLength(30)
                 .HasColumnName("name");
         });
 

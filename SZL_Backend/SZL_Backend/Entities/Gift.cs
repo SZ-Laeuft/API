@@ -9,7 +9,7 @@ public partial class Gift
 
     public string? Name { get; set; }
 
-    public int? Count { get; set; }
+    public int? Requirement { get; set; }
 
-    public virtual ICollection<Runner> Runners { get; set; } = new List<Runner>();
+    public virtual ICollection<Participate> Participates { get; set; } = new List<Participate>();
 }

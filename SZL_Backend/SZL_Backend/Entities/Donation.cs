@@ -7,9 +7,9 @@ public partial class Donation
 {
     public int Donationid { get; set; }
 
-    public int? Runnerid { get; set; }
+    public int? Participateid { get; set; }
 
-    public decimal? Amount { get; set; }
+    public double? Amount { get; set; }
 
-    public virtual Runner? Runner { get; set; }
+    public virtual Participate? Participate { get; set; }
 }

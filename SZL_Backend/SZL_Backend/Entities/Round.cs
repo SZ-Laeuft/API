@@ -5,11 +5,11 @@ namespace SZL_Backend.Entities;
 
 public partial class Round
 {
-    public int Roundsid { get; set; }
+    public int Roundid { get; set; }
 
-    public int? Runnerid { get; set; }
+    public int? Participateid { get; set; }
 
-    public DateTime? Timestamp { get; set; }
+    public DateTime? Roundtimestamp { get; set; }
 
-    public virtual Runner? Runner { get; set; }
+    public virtual Participate? Participate { get; set; }
 }

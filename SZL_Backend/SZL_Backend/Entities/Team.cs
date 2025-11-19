@@ -9,5 +9,5 @@ public partial class Team
 
     public string? Name { get; set; }
 
-    public virtual ICollection<Runner> Runners { get; set; } = new List<Runner>();
+    public virtual ICollection<Participate> Participates { get; set; } = new List<Participate>();
 }
