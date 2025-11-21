@@ -5,13 +5,13 @@ using SZL_Backend.Entities;
 
 namespace SZL_Backend.Context;
 
-public partial class MyDbContext : DbContext
+public partial class SZLDbContext : DbContext
 {
-    public MyDbContext()
+    public SZLDbContext()
     {
     }
 
-    public MyDbContext(DbContextOptions<MyDbContext> options)
+    public SZLDbContext(DbContextOptions<SZLDbContext> options)
         : base(options)
     {
     }
