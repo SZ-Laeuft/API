@@ -12,47 +12,47 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TagController : ControllerBase
+    public class GiftsController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
-        public TagController(SZLDbContext context)
+        public GiftsController(SZLDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Tag
+        // GET: api/Gift
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Tag>>> GetTags()
+        public async Task<ActionResult<IEnumerable<Gift>>> GetGifts()
         {
-            return await _context.Tags.ToListAsync();
+            return await _context.Gifts.ToListAsync();
         }
 
-        // GET: api/Tag/5
+        // GET: api/Gift/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Tag>> GetTag(int id)
+        public async Task<ActionResult<Gift>> GetGift(int id)
         {
-            var tag = await _context.Tags.FindAsync(id);
+            var gift = await _context.Gifts.FindAsync(id);
 
-            if (tag == null)
+            if (gift == null)
             {
                 return NotFound();
             }
 
-            return tag;
+            return gift;
         }
 
-        // PUT: api/Tag/5
+        // PUT: api/Gift/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTag(int id, Tag tag)
+        public async Task<IActionResult> PutGift(int id, Gift gift)
         {
-            if (id != tag.Tagid)
+            if (id != gift.Giftid)
             {
                 return BadRequest();
             }
 
-            _context.Entry(tag).State = EntityState.Modified;
+            _context.Entry(gift).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace SZL_Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TagExists(id))
+                if (!GiftExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace SZL_Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Tag
+        // POST: api/Gift
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Tag>> PostTag(Tag tag)
+        public async Task<ActionResult<Gift>> PostGift(Gift gift)
         {
-            _context.Tags.Add(tag);
+            _context.Gifts.Add(gift);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTag", new { id = tag.Tagid }, tag);
+            return CreatedAtAction("GetGift", new { id = gift.Giftid }, gift);
         }
 
-        // DELETE: api/Tag/5
+        // DELETE: api/Gift/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTag(int id)
+        public async Task<IActionResult> DeleteGift(int id)
         {
-            var tag = await _context.Tags.FindAsync(id);
-            if (tag == null)
+            var gift = await _context.Gifts.FindAsync(id);
+            if (gift == null)
             {
                 return NotFound();
             }
 
-            _context.Tags.Remove(tag);
+            _context.Gifts.Remove(gift);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TagExists(int id)
+        private bool GiftExists(int id)
         {
-            return _context.Tags.Any(e => e.Tagid == id);
+            return _context.Gifts.Any(e => e.Giftid == id);
         }
     }
 }

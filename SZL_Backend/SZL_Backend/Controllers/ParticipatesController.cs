@@ -12,47 +12,47 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamController : ControllerBase
+    public class ParticipatesController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
-        public TeamController(SZLDbContext context)
+        public ParticipatesController(SZLDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Team
+        // GET: api/Participate
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<Participate>>> GetParticipates()
         {
-            return await _context.Teams.ToListAsync();
+            return await _context.Participates.ToListAsync();
         }
 
-        // GET: api/Team/5
+        // GET: api/Participate/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Team>> GetTeam(int id)
+        public async Task<ActionResult<Participate>> GetParticipate(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
+            var participate = await _context.Participates.FindAsync(id);
 
-            if (team == null)
+            if (participate == null)
             {
                 return NotFound();
             }
 
-            return team;
+            return participate;
         }
 
-        // PUT: api/Team/5
+        // PUT: api/Participate/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeam(int id, Team team)
+        public async Task<IActionResult> PutParticipate(int id, Participate participate)
         {
-            if (id != team.Teamid)
+            if (id != participate.Participateid)
             {
                 return BadRequest();
             }
 
-            _context.Entry(team).State = EntityState.Modified;
+            _context.Entry(participate).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace SZL_Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TeamExists(id))
+                if (!ParticipateExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace SZL_Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Team
+        // POST: api/Participate
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Team>> PostTeam(Team team)
+        public async Task<ActionResult<Participate>> PostParticipate(Participate participate)
         {
-            _context.Teams.Add(team);
+            _context.Participates.Add(participate);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTeam", new { id = team.Teamid }, team);
+            return CreatedAtAction("GetParticipate", new { id = participate.Participateid }, participate);
         }
 
-        // DELETE: api/Team/5
+        // DELETE: api/Participate/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTeam(int id)
+        public async Task<IActionResult> DeleteParticipate(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
-            if (team == null)
+            var participate = await _context.Participates.FindAsync(id);
+            if (participate == null)
             {
                 return NotFound();
             }
 
-            _context.Teams.Remove(team);
+            _context.Participates.Remove(participate);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TeamExists(int id)
+        private bool ParticipateExists(int id)
         {
-            return _context.Teams.Any(e => e.Teamid == id);
+            return _context.Participates.Any(e => e.Participateid == id);
         }
     }
 }

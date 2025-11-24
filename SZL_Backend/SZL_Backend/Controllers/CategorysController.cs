@@ -12,11 +12,11 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class CategorysController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
-        public CategoryController(SZLDbContext context)
+        public CategorysController(SZLDbContext context)
         {
             _context = context;
         }

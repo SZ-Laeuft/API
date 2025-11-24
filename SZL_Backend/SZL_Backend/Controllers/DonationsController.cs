@@ -12,47 +12,47 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EventController : ControllerBase
+    public class DonationsController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
-        public EventController(SZLDbContext context)
+        public DonationsController(SZLDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Event
+        // GET: api/Donation
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        public async Task<ActionResult<IEnumerable<Donation>>> GetDonations()
         {
-            return await _context.Events.ToListAsync();
+            return await _context.Donations.ToListAsync();
         }
 
-        // GET: api/Event/5
+        // GET: api/Donation/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Event>> GetEvent(int id)
+        public async Task<ActionResult<Donation>> GetDonation(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
+            var donation = await _context.Donations.FindAsync(id);
 
-            if (@event == null)
+            if (donation == null)
             {
                 return NotFound();
             }
 
-            return @event;
+            return donation;
         }
 
-        // PUT: api/Event/5
+        // PUT: api/Donation/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEvent(int id, Event @event)
+        public async Task<IActionResult> PutDonation(int id, Donation donation)
         {
-            if (id != @event.Eventid)
+            if (id != donation.Donationid)
             {
                 return BadRequest();
             }
 
-            _context.Entry(@event).State = EntityState.Modified;
+            _context.Entry(donation).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace SZL_Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EventExists(id))
+                if (!DonationExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace SZL_Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Event
+        // POST: api/Donation
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent(Event @event)
+        public async Task<ActionResult<Donation>> PostDonation(Donation donation)
         {
-            _context.Events.Add(@event);
+            _context.Donations.Add(donation);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEvent", new { id = @event.Eventid }, @event);
+            return CreatedAtAction("GetDonation", new { id = donation.Donationid }, donation);
         }
 
-        // DELETE: api/Event/5
+        // DELETE: api/Donation/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEvent(int id)
+        public async Task<IActionResult> DeleteDonation(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
-            if (@event == null)
+            var donation = await _context.Donations.FindAsync(id);
+            if (donation == null)
             {
                 return NotFound();
             }
 
-            _context.Events.Remove(@event);
+            _context.Donations.Remove(donation);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool EventExists(int id)
+        private bool DonationExists(int id)
         {
-            return _context.Events.Any(e => e.Eventid == id);
+            return _context.Donations.Any(e => e.Donationid == id);
         }
     }
 }

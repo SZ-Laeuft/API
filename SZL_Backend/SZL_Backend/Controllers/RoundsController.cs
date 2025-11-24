@@ -12,47 +12,47 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RunnerController : ControllerBase
+    public class RoundsController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
-        public RunnerController(SZLDbContext context)
+        public RoundsController(SZLDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Runner
+        // GET: api/Round
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Runner>>> GetRunners()
+        public async Task<ActionResult<IEnumerable<Round>>> GetRounds()
         {
-            return await _context.Runners.ToListAsync();
+            return await _context.Rounds.ToListAsync();
         }
 
-        // GET: api/Runner/5
+        // GET: api/Round/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Runner>> GetRunner(int id)
+        public async Task<ActionResult<Round>> GetRound(int id)
         {
-            var runner = await _context.Runners.FindAsync(id);
+            var round = await _context.Rounds.FindAsync(id);
 
-            if (runner == null)
+            if (round == null)
             {
                 return NotFound();
             }
 
-            return runner;
+            return round;
         }
 
-        // PUT: api/Runner/5
+        // PUT: api/Round/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRunner(int id, Runner runner)
+        public async Task<IActionResult> PutRound(int id, Round round)
         {
-            if (id != runner.Runnerid)
+            if (id != round.Roundid)
             {
                 return BadRequest();
             }
 
-            _context.Entry(runner).State = EntityState.Modified;
+            _context.Entry(round).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace SZL_Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RunnerExists(id))
+                if (!RoundExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace SZL_Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Runner
+        // POST: api/Round
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Runner>> PostRunner(Runner runner)
+        public async Task<ActionResult<Round>> PostRound(Round round)
         {
-            _context.Runners.Add(runner);
+            _context.Rounds.Add(round);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRunner", new { id = runner.Runnerid }, runner);
+            return CreatedAtAction("GetRound", new { id = round.Roundid }, round);
         }
 
-        // DELETE: api/Runner/5
+        // DELETE: api/Round/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRunner(int id)
+        public async Task<IActionResult> DeleteRound(int id)
         {
-            var runner = await _context.Runners.FindAsync(id);
-            if (runner == null)
+            var round = await _context.Rounds.FindAsync(id);
+            if (round == null)
             {
                 return NotFound();
             }
 
-            _context.Runners.Remove(runner);
+            _context.Rounds.Remove(round);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool RunnerExists(int id)
+        private bool RoundExists(int id)
         {
-            return _context.Runners.Any(e => e.Runnerid == id);
+            return _context.Rounds.Any(e => e.Roundid == id);
         }
     }
 }

@@ -12,47 +12,47 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ParticipateController : ControllerBase
+    public class RunnersController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
-        public ParticipateController(SZLDbContext context)
+        public RunnersController(SZLDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Participate
+        // GET: api/Runner
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Participate>>> GetParticipates()
+        public async Task<ActionResult<IEnumerable<Runner>>> GetRunners()
         {
-            return await _context.Participates.ToListAsync();
+            return await _context.Runners.ToListAsync();
         }
 
-        // GET: api/Participate/5
+        // GET: api/Runner/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Participate>> GetParticipate(int id)
+        public async Task<ActionResult<Runner>> GetRunner(int id)
         {
-            var participate = await _context.Participates.FindAsync(id);
+            var runner = await _context.Runners.FindAsync(id);
 
-            if (participate == null)
+            if (runner == null)
             {
                 return NotFound();
             }
 
-            return participate;
+            return runner;
         }
 
-        // PUT: api/Participate/5
+        // PUT: api/Runner/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutParticipate(int id, Participate participate)
+        public async Task<IActionResult> PutRunner(int id, Runner runner)
         {
-            if (id != participate.Participateid)
+            if (id != runner.Runnerid)
             {
                 return BadRequest();
             }
 
-            _context.Entry(participate).State = EntityState.Modified;
+            _context.Entry(runner).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace SZL_Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ParticipateExists(id))
+                if (!RunnerExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace SZL_Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Participate
+        // POST: api/Runner
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Participate>> PostParticipate(Participate participate)
+        public async Task<ActionResult<Runner>> PostRunner(Runner runner)
         {
-            _context.Participates.Add(participate);
+            _context.Runners.Add(runner);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetParticipate", new { id = participate.Participateid }, participate);
+            return CreatedAtAction("GetRunner", new { id = runner.Runnerid }, runner);
         }
 
-        // DELETE: api/Participate/5
+        // DELETE: api/Runner/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteParticipate(int id)
+        public async Task<IActionResult> DeleteRunner(int id)
         {
-            var participate = await _context.Participates.FindAsync(id);
-            if (participate == null)
+            var runner = await _context.Runners.FindAsync(id);
+            if (runner == null)
             {
                 return NotFound();
             }
 
-            _context.Participates.Remove(participate);
+            _context.Runners.Remove(runner);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool ParticipateExists(int id)
+        private bool RunnerExists(int id)
         {
-            return _context.Participates.Any(e => e.Participateid == id);
+            return _context.Runners.Any(e => e.Runnerid == id);
         }
     }
 }
