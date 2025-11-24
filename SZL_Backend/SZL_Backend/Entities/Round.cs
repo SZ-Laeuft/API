@@ -7,7 +7,7 @@ public partial class Round
 {
     public int Roundid { get; set; }
 
-    public int? Participateid { get; set; }
+    public int Participateid { get; set; }
 
     public DateTime? Roundtimestamp { get; set; }
 
