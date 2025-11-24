@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
+using SZL_Backend.DTO;
 using SZL_Backend.Entities;
 
 namespace SZL_Backend.Controllers
@@ -21,88 +17,91 @@ namespace SZL_Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Gift
+        // GET: api/gifts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Gift>>> GetGifts()
+        public async Task<ActionResult<IEnumerable<GiftsDTO>>> GetGifts()
         {
-            return await _context.Gifts.ToListAsync();
+            return await _context.Gifts
+                .Select(g => new GiftsDTO
+                {
+                    Giftid = g.Giftid,
+                    Name = g.Name,
+                    Requirement = g.Requirement
+                })
+                .ToListAsync();
         }
 
-        // GET: api/Gift/5
+        // GET: api/gifts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Gift>> GetGift(int id)
+        public async Task<ActionResult<GiftsDTO>> GetGift(int id)
         {
-            var gift = await _context.Gifts.FindAsync(id);
+            var gift = await _context.Gifts
+                .Where(g => g.Giftid == id)
+                .Select(g => new GiftsDTO
+                {
+                    Giftid = g.Giftid,
+                    Name = g.Name,
+                    Requirement = g.Requirement
+                })
+                .FirstOrDefaultAsync();
 
             if (gift == null)
-            {
                 return NotFound();
-            }
 
             return gift;
         }
 
-        // PUT: api/Gift/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutGift(int id, Gift gift)
+        // POST: api/gifts
+        [HttpPost]
+        public async Task<ActionResult<GiftsDTO>> PostGift(GiftsCreateDTO dto)
         {
-            if (id != gift.Giftid)
+            var gift = new Gift
             {
-                return BadRequest();
-            }
+                Name = dto.Name,
+                Requirement = dto.Requirement
+            };
 
-            _context.Entry(gift).State = EntityState.Modified;
+            _context.Gifts.Add(gift);
+            await _context.SaveChangesAsync();
 
-            try
+            var result = new GiftsDTO
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!GiftExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                Giftid = gift.Giftid,
+                Name = gift.Name,
+                Requirement = gift.Requirement
+            };
+
+            return CreatedAtAction(nameof(GetGift), new { id = gift.Giftid }, result);
+        }
+
+        // PUT: api/gifts/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutGift(int id, GiftsCreateDTO dto)
+        {
+            var gift = await _context.Gifts.FindAsync(id);
+            if (gift == null)
+                return NotFound();
+
+            gift.Name = dto.Name;
+            gift.Requirement = dto.Requirement;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // POST: api/Gift
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Gift>> PostGift(Gift gift)
-        {
-            _context.Gifts.Add(gift);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetGift", new { id = gift.Giftid }, gift);
-        }
-
-        // DELETE: api/Gift/5
+        // DELETE: api/gifts/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGift(int id)
         {
             var gift = await _context.Gifts.FindAsync(id);
             if (gift == null)
-            {
                 return NotFound();
-            }
 
             _context.Gifts.Remove(gift);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool GiftExists(int id)
-        {
-            return _context.Gifts.Any(e => e.Giftid == id);
         }
     }
 }

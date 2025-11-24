@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
+using SZL_Backend.DTO;
 using SZL_Backend.Entities;
 
 namespace SZL_Backend.Controllers
@@ -21,88 +17,91 @@ namespace SZL_Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Donation
+        // GET: api/donations
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Donation>>> GetDonations()
+        public async Task<ActionResult<IEnumerable<DonationsDTO>>> GetDonations()
         {
-            return await _context.Donations.ToListAsync();
+            return await _context.Donations
+                .Select(d => new DonationsDTO
+                {
+                    Donationid = d.Donationid,
+                    Participateid = d.Participateid,
+                    Amount = d.Amount
+                })
+                .ToListAsync();
         }
 
-        // GET: api/Donation/5
+        // GET: api/donations/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Donation>> GetDonation(int id)
+        public async Task<ActionResult<DonationsDTO>> GetDonation(int id)
         {
-            var donation = await _context.Donations.FindAsync(id);
+            var donation = await _context.Donations
+                .Where(d => d.Donationid == id)
+                .Select(d => new DonationsDTO
+                {
+                    Donationid = d.Donationid,
+                    Participateid = d.Participateid,
+                    Amount = d.Amount
+                })
+                .FirstOrDefaultAsync();
 
             if (donation == null)
-            {
                 return NotFound();
-            }
 
             return donation;
         }
 
-        // PUT: api/Donation/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutDonation(int id, Donation donation)
+        // POST: api/donations
+        [HttpPost]
+        public async Task<ActionResult<DonationsDTO>> PostDonation(DonationsCreateDTO dto)
         {
-            if (id != donation.Donationid)
+            var donation = new Donation
             {
-                return BadRequest();
-            }
+                Participateid = dto.Participateid,
+                Amount = dto.Amount
+            };
 
-            _context.Entry(donation).State = EntityState.Modified;
+            _context.Donations.Add(donation);
+            await _context.SaveChangesAsync();
 
-            try
+            var result = new DonationsDTO
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DonationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                Donationid = donation.Donationid,
+                Participateid = donation.Participateid,
+                Amount = donation.Amount
+            };
+
+            return CreatedAtAction(nameof(GetDonation), new { id = donation.Donationid }, result);
+        }
+
+        // PUT: api/donations/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutDonation(int id, DonationsCreateDTO dto)
+        {
+            var donation = await _context.Donations.FindAsync(id);
+            if (donation == null)
+                return NotFound();
+
+            donation.Participateid = dto.Participateid;
+            donation.Amount = dto.Amount;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // POST: api/Donation
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Donation>> PostDonation(Donation donation)
-        {
-            _context.Donations.Add(donation);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetDonation", new { id = donation.Donationid }, donation);
-        }
-
-        // DELETE: api/Donation/5
+        // DELETE: api/donations/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDonation(int id)
         {
             var donation = await _context.Donations.FindAsync(id);
             if (donation == null)
-            {
                 return NotFound();
-            }
 
             _context.Donations.Remove(donation);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool DonationExists(int id)
-        {
-            return _context.Donations.Any(e => e.Donationid == id);
         }
     }
 }

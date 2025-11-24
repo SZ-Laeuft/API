@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
+using SZL_Backend.DTO;
 using SZL_Backend.Entities;
+
 
 namespace SZL_Backend.Controllers
 {
@@ -21,88 +18,91 @@ namespace SZL_Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Runner
+        // GET: api/runners
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Runner>>> GetRunners()
+        public async Task<ActionResult<IEnumerable<RunnersDTO>>> GetRunners()
         {
-            return await _context.Runners.ToListAsync();
+            return await _context.Runners
+                .Select(r => new RunnersDTO
+                {
+                    Runnerid = r.Runnerid,
+                    Firstname = r.Firstname,
+                    Lastname = r.Lastname
+                })
+                .ToListAsync();
         }
 
-        // GET: api/Runner/5
+        // GET: api/runners/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Runner>> GetRunner(int id)
+        public async Task<ActionResult<RunnersDTO>> GetRunner(int id)
         {
-            var runner = await _context.Runners.FindAsync(id);
+            var runner = await _context.Runners
+                .Where(r => r.Runnerid == id)
+                .Select(r => new RunnersDTO
+                {
+                    Runnerid = r.Runnerid,
+                    Firstname = r.Firstname,
+                    Lastname = r.Lastname
+                })
+                .FirstOrDefaultAsync();
 
             if (runner == null)
-            {
                 return NotFound();
-            }
 
             return runner;
         }
 
-        // PUT: api/Runner/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRunner(int id, Runner runner)
+        // POST: api/runners
+        [HttpPost]
+        public async Task<ActionResult<RunnersDTO>> PostRunner(RunnersCreateDTO dto)
         {
-            if (id != runner.Runnerid)
+            var runner = new Runner
             {
-                return BadRequest();
-            }
+                Firstname = dto.Firstname,
+                Lastname = dto.Lastname
+            };
 
-            _context.Entry(runner).State = EntityState.Modified;
+            _context.Runners.Add(runner);
+            await _context.SaveChangesAsync();
 
-            try
+            var result = new RunnersDTO
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RunnerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                Runnerid = runner.Runnerid,
+                Firstname = runner.Firstname,
+                Lastname = runner.Lastname
+            };
+
+            return CreatedAtAction(nameof(GetRunner), new { id = runner.Runnerid }, result);
+        }
+
+        // PUT: api/runners/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutRunner(int id, RunnersCreateDTO dto)
+        {
+            var runner = await _context.Runners.FindAsync(id);
+            if (runner == null)
+                return NotFound();
+
+            runner.Firstname = dto.Firstname;
+            runner.Lastname = dto.Lastname;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // POST: api/Runner
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Runner>> PostRunner(Runner runner)
-        {
-            _context.Runners.Add(runner);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetRunner", new { id = runner.Runnerid }, runner);
-        }
-
-        // DELETE: api/Runner/5
+        // DELETE: api/runners/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRunner(int id)
         {
             var runner = await _context.Runners.FindAsync(id);
             if (runner == null)
-            {
                 return NotFound();
-            }
 
             _context.Runners.Remove(runner);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool RunnerExists(int id)
-        {
-            return _context.Runners.Any(e => e.Runnerid == id);
         }
     }
 }

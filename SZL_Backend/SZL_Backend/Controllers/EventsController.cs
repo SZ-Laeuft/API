@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
+using SZL_Backend.DTO;
 using SZL_Backend.Entities;
 
 namespace SZL_Backend.Controllers
@@ -21,88 +17,111 @@ namespace SZL_Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Event
+        // GET: api/events
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        public async Task<ActionResult<IEnumerable<EventsDTO>>> GetEvents()
         {
-            return await _context.Events.ToListAsync();
+            return await _context.Events
+                .Select(e => new EventsDTO
+                {
+                    Eventid = e.Eventid,
+                    Name = e.Name,
+                    Place = e.Place,
+                    Isactive = e.Isactive,
+                    Starttime = e.Starttime,
+                    Endtime = e.Endtime,
+                    Categoryid = e.Categoryid
+                })
+                .ToListAsync();
         }
 
-        // GET: api/Event/5
+        // GET: api/events/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Event>> GetEvent(int id)
+        public async Task<ActionResult<EventsDTO>> GetEvent(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
+            var evt = await _context.Events
+                .Where(e => e.Eventid == id)
+                .Select(e => new EventsDTO
+                {
+                    Eventid = e.Eventid,
+                    Name = e.Name,
+                    Place = e.Place,
+                    Isactive = e.Isactive,
+                    Starttime = e.Starttime,
+                    Endtime = e.Endtime,
+                    Categoryid = e.Categoryid
+                })
+                .FirstOrDefaultAsync();
 
-            if (@event == null)
-            {
+            if (evt == null)
                 return NotFound();
-            }
 
-            return @event;
+            return evt;
         }
 
-        // PUT: api/Event/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutEvent(int id, Event @event)
+        // POST: api/events
+        [HttpPost]
+        public async Task<ActionResult<EventsDTO>> PostEvent(EventsCreateDTO dto)
         {
-            if (id != @event.Eventid)
+            var evt = new Event
             {
-                return BadRequest();
-            }
+                Name = dto.Name,
+                Place = dto.Place,
+                Isactive = dto.Isactive,
+                Starttime = dto.Starttime,
+                Endtime = dto.Endtime,
+                Categoryid = dto.Categoryid
+            };
 
-            _context.Entry(@event).State = EntityState.Modified;
+            _context.Events.Add(evt);
+            await _context.SaveChangesAsync();
 
-            try
+            var result = new EventsDTO
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EventExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                Eventid = evt.Eventid,
+                Name = evt.Name,
+                Place = evt.Place,
+                Isactive = evt.Isactive,
+                Starttime = evt.Starttime,
+                Endtime = evt.Endtime,
+                Categoryid = evt.Categoryid
+            };
+
+            return CreatedAtAction(nameof(GetEvent), new { id = evt.Eventid }, result);
+        }
+
+        // PUT: api/events/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutEvent(int id, EventsCreateDTO dto)
+        {
+            var evt = await _context.Events.FindAsync(id);
+            if (evt == null)
+                return NotFound();
+
+            evt.Name = dto.Name;
+            evt.Place = dto.Place;
+            evt.Isactive = dto.Isactive;
+            evt.Starttime = dto.Starttime;
+            evt.Endtime = dto.Endtime;
+            evt.Categoryid = dto.Categoryid;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // POST: api/Event
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent(Event @event)
-        {
-            _context.Events.Add(@event);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetEvent", new { id = @event.Eventid }, @event);
-        }
-
-        // DELETE: api/Event/5
+        // DELETE: api/events/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
-            var @event = await _context.Events.FindAsync(id);
-            if (@event == null)
-            {
+            var evt = await _context.Events.FindAsync(id);
+            if (evt == null)
                 return NotFound();
-            }
 
-            _context.Events.Remove(@event);
+            _context.Events.Remove(evt);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool EventExists(int id)
-        {
-            return _context.Events.Any(e => e.Eventid == id);
         }
     }
 }
