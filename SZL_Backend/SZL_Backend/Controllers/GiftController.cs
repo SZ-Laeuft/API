@@ -12,47 +12,47 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamController : ControllerBase
+    public class GiftController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
-        public TeamController(SZLDbContext context)
+        public GiftController(SZLDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Team
+        // GET: api/Gift
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<Gift>>> GetGifts()
         {
-            return await _context.Teams.ToListAsync();
+            return await _context.Gifts.ToListAsync();
         }
 
-        // GET: api/Team/5
+        // GET: api/Gift/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Team>> GetTeam(int id)
+        public async Task<ActionResult<Gift>> GetGift(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
+            var gift = await _context.Gifts.FindAsync(id);
 
-            if (team == null)
+            if (gift == null)
             {
                 return NotFound();
             }
 
-            return team;
+            return gift;
         }
 
-        // PUT: api/Team/5
+        // PUT: api/Gift/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeam(int id, Team team)
+        public async Task<IActionResult> PutGift(int id, Gift gift)
         {
-            if (id != team.Teamid)
+            if (id != gift.Giftid)
             {
                 return BadRequest();
             }
 
-            _context.Entry(team).State = EntityState.Modified;
+            _context.Entry(gift).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace SZL_Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TeamExists(id))
+                if (!GiftExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace SZL_Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Team
+        // POST: api/Gift
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Team>> PostTeam(Team team)
+        public async Task<ActionResult<Gift>> PostGift(Gift gift)
         {
-            _context.Teams.Add(team);
+            _context.Gifts.Add(gift);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTeam", new { id = team.Teamid }, team);
+            return CreatedAtAction("GetGift", new { id = gift.Giftid }, gift);
         }
 
-        // DELETE: api/Team/5
+        // DELETE: api/Gift/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTeam(int id)
+        public async Task<IActionResult> DeleteGift(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
-            if (team == null)
+            var gift = await _context.Gifts.FindAsync(id);
+            if (gift == null)
             {
                 return NotFound();
             }
 
-            _context.Teams.Remove(team);
+            _context.Gifts.Remove(gift);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TeamExists(int id)
+        private bool GiftExists(int id)
         {
-            return _context.Teams.Any(e => e.Teamid == id);
+            return _context.Gifts.Any(e => e.Giftid == id);
         }
     }
 }

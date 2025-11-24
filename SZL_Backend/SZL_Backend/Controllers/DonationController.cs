@@ -12,47 +12,47 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamController : ControllerBase
+    public class DonationController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
-        public TeamController(SZLDbContext context)
+        public DonationController(SZLDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Team
+        // GET: api/Donation
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<Donation>>> GetDonations()
         {
-            return await _context.Teams.ToListAsync();
+            return await _context.Donations.ToListAsync();
         }
 
-        // GET: api/Team/5
+        // GET: api/Donation/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Team>> GetTeam(int id)
+        public async Task<ActionResult<Donation>> GetDonation(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
+            var donation = await _context.Donations.FindAsync(id);
 
-            if (team == null)
+            if (donation == null)
             {
                 return NotFound();
             }
 
-            return team;
+            return donation;
         }
 
-        // PUT: api/Team/5
+        // PUT: api/Donation/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeam(int id, Team team)
+        public async Task<IActionResult> PutDonation(int id, Donation donation)
         {
-            if (id != team.Teamid)
+            if (id != donation.Donationid)
             {
                 return BadRequest();
             }
 
-            _context.Entry(team).State = EntityState.Modified;
+            _context.Entry(donation).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace SZL_Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TeamExists(id))
+                if (!DonationExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace SZL_Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Team
+        // POST: api/Donation
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Team>> PostTeam(Team team)
+        public async Task<ActionResult<Donation>> PostDonation(Donation donation)
         {
-            _context.Teams.Add(team);
+            _context.Donations.Add(donation);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTeam", new { id = team.Teamid }, team);
+            return CreatedAtAction("GetDonation", new { id = donation.Donationid }, donation);
         }
 
-        // DELETE: api/Team/5
+        // DELETE: api/Donation/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTeam(int id)
+        public async Task<IActionResult> DeleteDonation(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
-            if (team == null)
+            var donation = await _context.Donations.FindAsync(id);
+            if (donation == null)
             {
                 return NotFound();
             }
 
-            _context.Teams.Remove(team);
+            _context.Donations.Remove(donation);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TeamExists(int id)
+        private bool DonationExists(int id)
         {
-            return _context.Teams.Any(e => e.Teamid == id);
+            return _context.Donations.Any(e => e.Donationid == id);
         }
     }
 }

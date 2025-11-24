@@ -12,47 +12,47 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamController : ControllerBase
+    public class TagController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
-        public TeamController(SZLDbContext context)
+        public TagController(SZLDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Team
+        // GET: api/Tag
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<Tag>>> GetTags()
         {
-            return await _context.Teams.ToListAsync();
+            return await _context.Tags.ToListAsync();
         }
 
-        // GET: api/Team/5
+        // GET: api/Tag/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Team>> GetTeam(int id)
+        public async Task<ActionResult<Tag>> GetTag(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
+            var tag = await _context.Tags.FindAsync(id);
 
-            if (team == null)
+            if (tag == null)
             {
                 return NotFound();
             }
 
-            return team;
+            return tag;
         }
 
-        // PUT: api/Team/5
+        // PUT: api/Tag/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeam(int id, Team team)
+        public async Task<IActionResult> PutTag(int id, Tag tag)
         {
-            if (id != team.Teamid)
+            if (id != tag.Tagid)
             {
                 return BadRequest();
             }
 
-            _context.Entry(team).State = EntityState.Modified;
+            _context.Entry(tag).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace SZL_Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TeamExists(id))
+                if (!TagExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace SZL_Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Team
+        // POST: api/Tag
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Team>> PostTeam(Team team)
+        public async Task<ActionResult<Tag>> PostTag(Tag tag)
         {
-            _context.Teams.Add(team);
+            _context.Tags.Add(tag);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTeam", new { id = team.Teamid }, team);
+            return CreatedAtAction("GetTag", new { id = tag.Tagid }, tag);
         }
 
-        // DELETE: api/Team/5
+        // DELETE: api/Tag/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTeam(int id)
+        public async Task<IActionResult> DeleteTag(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
-            if (team == null)
+            var tag = await _context.Tags.FindAsync(id);
+            if (tag == null)
             {
                 return NotFound();
             }
 
-            _context.Teams.Remove(team);
+            _context.Tags.Remove(tag);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TeamExists(int id)
+        private bool TagExists(int id)
         {
-            return _context.Teams.Any(e => e.Teamid == id);
+            return _context.Tags.Any(e => e.Tagid == id);
         }
     }
 }

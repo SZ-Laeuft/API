@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
+using SZL_Backend.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,9 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-builder.Services.AddNpgsql<DbContext>(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddDbContext<SZLDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 var app = builder.Build();
 

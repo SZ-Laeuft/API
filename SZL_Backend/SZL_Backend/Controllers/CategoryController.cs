@@ -12,47 +12,47 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamController : ControllerBase
+    public class CategoryController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
-        public TeamController(SZLDbContext context)
+        public CategoryController(SZLDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Team
+        // GET: api/Category
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
-            return await _context.Teams.ToListAsync();
+            return await _context.Categories.ToListAsync();
         }
 
-        // GET: api/Team/5
+        // GET: api/Category/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Team>> GetTeam(int id)
+        public async Task<ActionResult<Category>> GetCategory(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
+            var category = await _context.Categories.FindAsync(id);
 
-            if (team == null)
+            if (category == null)
             {
                 return NotFound();
             }
 
-            return team;
+            return category;
         }
 
-        // PUT: api/Team/5
+        // PUT: api/Category/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeam(int id, Team team)
+        public async Task<IActionResult> PutCategory(int id, Category category)
         {
-            if (id != team.Teamid)
+            if (id != category.Categoryid)
             {
                 return BadRequest();
             }
 
-            _context.Entry(team).State = EntityState.Modified;
+            _context.Entry(category).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace SZL_Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TeamExists(id))
+                if (!CategoryExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,36 @@ namespace SZL_Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Team
+        // POST: api/Category
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Team>> PostTeam(Team team)
+        public async Task<ActionResult<Category>> PostCategory(Category category)
         {
-            _context.Teams.Add(team);
+            _context.Categories.Add(category);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTeam", new { id = team.Teamid }, team);
+            return CreatedAtAction("GetCategory", new { id = category.Categoryid }, category);
         }
 
-        // DELETE: api/Team/5
+        // DELETE: api/Category/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTeam(int id)
+        public async Task<IActionResult> DeleteCategory(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
-            if (team == null)
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
             {
                 return NotFound();
             }
 
-            _context.Teams.Remove(team);
+            _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool TeamExists(int id)
+        private bool CategoryExists(int id)
         {
-            return _context.Teams.Any(e => e.Teamid == id);
+            return _context.Categories.Any(e => e.Categoryid == id);
         }
     }
 }
