@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
-using SZL_Backend.DTO;
+using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
 
@@ -20,10 +20,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/participates
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ParticipatesDTO>>> GetParticipates()
+        public async Task<ActionResult<IEnumerable<ParticipatesDto>>> GetParticipates()
         {
             return await _context.Participates
-                .Select(p => new ParticipatesDTO
+                .Select(p => new ParticipatesDto
                 {
                     Participateid = p.Participateid,
                     Teamid = p.Teamid,
@@ -36,11 +36,11 @@ namespace SZL_Backend.Controllers
 
         // GET: api/participates/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ParticipatesDTO>> GetParticipate(int id)
+        public async Task<ActionResult<ParticipatesDto>> GetParticipate(int id)
         {
             var participate = await _context.Participates
                 .Where(p => p.Participateid == id)
-                .Select(p => new ParticipatesDTO
+                .Select(p => new ParticipatesDto
                 {
                     Participateid = p.Participateid,
                     Teamid = p.Teamid,
@@ -58,7 +58,7 @@ namespace SZL_Backend.Controllers
 
         // POST: api/participates
         [HttpPost]
-        public async Task<ActionResult<ParticipatesDTO>> PostParticipate(ParticipatesCreateDTO dto)
+        public async Task<ActionResult<ParticipatesDto>> PostParticipate(ParticipatesCreateDto dto)
         {
             var participate = new Participate
             {
@@ -71,7 +71,7 @@ namespace SZL_Backend.Controllers
             _context.Participates.Add(participate);
             await _context.SaveChangesAsync();
 
-            var result = new ParticipatesDTO
+            var result = new ParticipatesDto
             {
                 Participateid = participate.Participateid,
                 Teamid = participate.Teamid,
@@ -85,7 +85,7 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/participates/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutParticipate(int id, ParticipatesCreateDTO dto)
+        public async Task<IActionResult> PutParticipate(int id, ParticipatesCreateDto dto)
         {
             var participate = await _context.Participates.FindAsync(id);
             if (participate == null)

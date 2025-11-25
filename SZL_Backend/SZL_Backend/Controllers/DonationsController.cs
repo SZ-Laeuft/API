@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
-using SZL_Backend.DTO;
+using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
 namespace SZL_Backend.Controllers
@@ -19,10 +19,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/donations
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DonationsDTO>>> GetDonations()
+        public async Task<ActionResult<IEnumerable<DonationsDto>>> GetDonations()
         {
             return await _context.Donations
-                .Select(d => new DonationsDTO
+                .Select(d => new DonationsDto
                 {
                     Donationid = d.Donationid,
                     Participateid = d.Participateid,
@@ -33,11 +33,11 @@ namespace SZL_Backend.Controllers
 
         // GET: api/donations/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<DonationsDTO>> GetDonation(int id)
+        public async Task<ActionResult<DonationsDto>> GetDonation(int id)
         {
             var donation = await _context.Donations
                 .Where(d => d.Donationid == id)
-                .Select(d => new DonationsDTO
+                .Select(d => new DonationsDto
                 {
                     Donationid = d.Donationid,
                     Participateid = d.Participateid,
@@ -53,7 +53,7 @@ namespace SZL_Backend.Controllers
 
         // POST: api/donations
         [HttpPost]
-        public async Task<ActionResult<DonationsDTO>> PostDonation(DonationsCreateDTO dto)
+        public async Task<ActionResult<DonationsDto>> PostDonation(DonationsCreateDto dto)
         {
             var donation = new Donation
             {
@@ -64,7 +64,7 @@ namespace SZL_Backend.Controllers
             _context.Donations.Add(donation);
             await _context.SaveChangesAsync();
 
-            var result = new DonationsDTO
+            var result = new DonationsDto
             {
                 Donationid = donation.Donationid,
                 Participateid = donation.Participateid,
@@ -76,7 +76,7 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/donations/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutDonation(int id, DonationsCreateDTO dto)
+        public async Task<IActionResult> PutDonation(int id, DonationsCreateDto dto)
         {
             var donation = await _context.Donations.FindAsync(id);
             if (donation == null)

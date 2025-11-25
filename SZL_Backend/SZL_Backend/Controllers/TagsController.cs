@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
-using SZL_Backend.DTO;
+using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
 namespace SZL_Backend.Controllers
@@ -19,10 +19,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/tags
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TagsDTO>>> GetTags()
+        public async Task<ActionResult<IEnumerable<TagsDto>>> GetTags()
         {
             return await _context.Tags
-                .Select(t => new TagsDTO
+                .Select(t => new TagsDto
                 {
                     Tagid = t.Tagid,
                     Status = t.Status
@@ -32,11 +32,11 @@ namespace SZL_Backend.Controllers
 
         // GET: api/tags/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TagsDTO>> GetTag(int id)
+        public async Task<ActionResult<TagsDto>> GetTag(int id)
         {
             var tag = await _context.Tags
                 .Where(t => t.Tagid == id)
-                .Select(t => new TagsDTO
+                .Select(t => new TagsDto
                 {
                     Tagid = t.Tagid,
                     Status = t.Status
@@ -51,7 +51,7 @@ namespace SZL_Backend.Controllers
 
         // POST: api/tags
         [HttpPost]
-        public async Task<ActionResult<TagsDTO>> PostTag(TagsCreateDTO dto)
+        public async Task<ActionResult<TagsDto>> PostTag(TagsCreateDto dto)
         {
             var tag = new Tag
             {
@@ -61,7 +61,7 @@ namespace SZL_Backend.Controllers
             _context.Tags.Add(tag);
             await _context.SaveChangesAsync();
 
-            var result = new TagsDTO
+            var result = new TagsDto
             {
                 Tagid = tag.Tagid,
                 Status = tag.Status
@@ -72,7 +72,7 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/tags/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTag(int id, TagsCreateDTO dto)
+        public async Task<IActionResult> PutTag(int id, TagsCreateDto dto)
         {
             var tag = await _context.Tags.FindAsync(id);
             if (tag == null)

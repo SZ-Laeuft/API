@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
-using SZL_Backend.DTO;
+using SZL_Backend.Dto;
 using SZL_Backend.Entities;
-using static SZL_Backend.DTO.CategorysDTO;
+using static SZL_Backend.Dto.CategorysDto;
 
 namespace SZL_Backend.Controllers
 {
@@ -20,10 +20,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/categorys
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategorysDTO>>> GetCategories()
+        public async Task<ActionResult<IEnumerable<CategorysDto>>> GetCategories()
         {
             return await _context.Categories
-                .Select(c => new CategorysDTO
+                .Select(c => new CategorysDto
                 {
                     Categoryid = c.Categoryid,
                     Name = c.Name
@@ -33,10 +33,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/categorys/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CategorysDTO>> GetCategory(int id)
+        public async Task<ActionResult<CategorysDto>> GetCategory(int id)
         {
             var category = await _context.Categories
-                .Select(c => new CategorysDTO
+                .Select(c => new CategorysDto
                 {
                     Categoryid = c.Categoryid,
                     Name = c.Name
@@ -51,7 +51,7 @@ namespace SZL_Backend.Controllers
 
         // POST: api/categorys
         [HttpPost]
-        public async Task<ActionResult<CategorysDTO>> PostCategory(CategorysCreateDTO dto)
+        public async Task<ActionResult<CategorysDto>> PostCategory(CategorysCreateDto dto)
         {
             var category = new Category
             {
@@ -61,7 +61,7 @@ namespace SZL_Backend.Controllers
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
 
-            var result = new CategorysDTO
+            var result = new CategorysDto
             {
                 Categoryid = category.Categoryid,
                 Name = category.Name
@@ -73,7 +73,7 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/categorys/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(int id, CategorysCreateDTO dto)
+        public async Task<IActionResult> PutCategory(int id, CategorysCreateDto dto)
         {
             var category = await _context.Categories.FindAsync(id);
             if (category == null)

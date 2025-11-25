@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
-using SZL_Backend.DTO;
+using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
 
@@ -20,10 +20,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/teams
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TeamsDTO>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<TeamsDto>>> GetTeams()
         {
             return await _context.Teams
-                .Select(t => new TeamsDTO
+                .Select(t => new TeamsDto
                 {
                     Teamid = t.Teamid,
                     Name = t.Name
@@ -33,11 +33,11 @@ namespace SZL_Backend.Controllers
 
         // GET: api/teams/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TeamsDTO>> GetTeam(int id)
+        public async Task<ActionResult<TeamsDto>> GetTeam(int id)
         {
             var team = await _context.Teams
                 .Where(t => t.Teamid == id)
-                .Select(t => new TeamsDTO
+                .Select(t => new TeamsDto
                 {
                     Teamid = t.Teamid,
                     Name = t.Name
@@ -52,7 +52,7 @@ namespace SZL_Backend.Controllers
 
         // POST: api/teams
         [HttpPost]
-        public async Task<ActionResult<TeamsDTO>> PostTeam(TeamsCreateDTO dto)
+        public async Task<ActionResult<TeamsDto>> PostTeam(TeamsCreateDto dto)
         {
             var team = new Team
             {
@@ -62,7 +62,7 @@ namespace SZL_Backend.Controllers
             _context.Teams.Add(team);
             await _context.SaveChangesAsync();
 
-            var result = new TeamsDTO
+            var result = new TeamsDto
             {
                 Teamid = team.Teamid,
                 Name = team.Name
@@ -73,7 +73,7 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/teams/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeam(int id, TeamsCreateDTO dto)
+        public async Task<IActionResult> PutTeam(int id, TeamsCreateDto dto)
         {
             var team = await _context.Teams.FindAsync(id);
             if (team == null)

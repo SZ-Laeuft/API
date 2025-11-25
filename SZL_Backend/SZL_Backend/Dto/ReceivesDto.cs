@@ -1,6 +1,6 @@
-namespace SZL_Backend.DTO;
+namespace SZL_Backend.Dto;
 
-public class ReceivesDTO
+public class ReceivesDto
 {
     public int Giftid { get; set; }
     

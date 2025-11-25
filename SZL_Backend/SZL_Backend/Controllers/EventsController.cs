@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
-using SZL_Backend.DTO;
+using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
 namespace SZL_Backend.Controllers
@@ -19,10 +19,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/events
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EventsDTO>>> GetEvents()
+        public async Task<ActionResult<IEnumerable<EventsDto>>> GetEvents()
         {
             return await _context.Events
-                .Select(e => new EventsDTO
+                .Select(e => new EventsDto
                 {
                     Eventid = e.Eventid,
                     Name = e.Name,
@@ -37,11 +37,11 @@ namespace SZL_Backend.Controllers
 
         // GET: api/events/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<EventsDTO>> GetEvent(int id)
+        public async Task<ActionResult<EventsDto>> GetEvent(int id)
         {
             var evt = await _context.Events
                 .Where(e => e.Eventid == id)
-                .Select(e => new EventsDTO
+                .Select(e => new EventsDto
                 {
                     Eventid = e.Eventid,
                     Name = e.Name,
@@ -61,7 +61,7 @@ namespace SZL_Backend.Controllers
 
         // POST: api/events
         [HttpPost]
-        public async Task<ActionResult<EventsDTO>> PostEvent(EventsCreateDTO dto)
+        public async Task<ActionResult<EventsDto>> PostEvent(EventsCreateDto dto)
         {
             var evt = new Event
             {
@@ -76,7 +76,7 @@ namespace SZL_Backend.Controllers
             _context.Events.Add(evt);
             await _context.SaveChangesAsync();
 
-            var result = new EventsDTO
+            var result = new EventsDto
             {
                 Eventid = evt.Eventid,
                 Name = evt.Name,
@@ -92,7 +92,7 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/events/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEvent(int id, EventsCreateDTO dto)
+        public async Task<IActionResult> PutEvent(int id, EventsCreateDto dto)
         {
             var evt = await _context.Events.FindAsync(id);
             if (evt == null)

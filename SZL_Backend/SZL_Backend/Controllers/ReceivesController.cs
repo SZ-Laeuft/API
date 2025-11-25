@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using SZL_Backend.DTO;
+using SZL_Backend.Dto;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,18 +9,18 @@ namespace SZL_Backend.Controllers
     [Route("api/[controller]")]
     public class ReceivesController : ControllerBase
     {
-        private static List<ReceivesDTO> _receives = new List<ReceivesDTO>();
+        private static List<ReceivesDto> _receives = new List<ReceivesDto>();
 
         // GET: api/receives
         [HttpGet]
-        public ActionResult<IEnumerable<ReceivesDTO>> GetAll()
+        public ActionResult<IEnumerable<ReceivesDto>> GetAll()
         {
             return Ok(_receives);
         }
 
         // GET: api/receives/{giftId}/{participateId}
         [HttpGet("{giftId}/{participateId}")]
-        public ActionResult<ReceivesDTO> Get(int giftId, int participateId)
+        public ActionResult<ReceivesDto> Get(int giftId, int participateId)
         {
             var receive = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
             if (receive == null)
@@ -30,7 +30,7 @@ namespace SZL_Backend.Controllers
 
         // POST: api/receives
         [HttpPost]
-        public ActionResult<ReceivesDTO> Create([FromBody] ReceivesDTO dto)
+        public ActionResult<ReceivesDto> Create([FromBody] ReceivesDto dto)
         {
             if (_receives.Any(r => r.Giftid == dto.Giftid && r.Participateid == dto.Participateid))
                 return Conflict("This record already exists.");
@@ -41,7 +41,7 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/receives/{giftId}/{participateId}
         [HttpPut("{giftId}/{participateId}")]
-        public IActionResult Update(int giftId, int participateId, [FromBody] ReceivesDTO dto)
+        public IActionResult Update(int giftId, int participateId, [FromBody] ReceivesDto dto)
         {
             var receive = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
             if (receive == null)

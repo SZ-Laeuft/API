@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
-using SZL_Backend.DTO;
+using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
 
@@ -20,10 +20,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/rounds
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RoundsDTO>>> GetRounds()
+        public async Task<ActionResult<IEnumerable<RoundsDto>>> GetRounds()
         {
             return await _context.Rounds
-                .Select(r => new RoundsDTO
+                .Select(r => new RoundsDto
                 {
                     Roundid = r.Roundid,
                     Participateid = r.Participateid,
@@ -34,11 +34,11 @@ namespace SZL_Backend.Controllers
 
         // GET: api/rounds/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<RoundsDTO>> GetRound(int id)
+        public async Task<ActionResult<RoundsDto>> GetRound(int id)
         {
             var round = await _context.Rounds
                 .Where(r => r.Roundid == id)
-                .Select(r => new RoundsDTO
+                .Select(r => new RoundsDto
                 {
                     Roundid = r.Roundid,
                     Participateid = r.Participateid,
@@ -54,7 +54,7 @@ namespace SZL_Backend.Controllers
 
         // POST: api/rounds
         [HttpPost]
-        public async Task<ActionResult<RoundsDTO>> PostRound(RoundsCreateDTO dto)
+        public async Task<ActionResult<RoundsDto>> PostRound(RoundsCreateDto dto)
         {
             var round = new Round
             {
@@ -65,7 +65,7 @@ namespace SZL_Backend.Controllers
             _context.Rounds.Add(round);
             await _context.SaveChangesAsync();
 
-            var result = new RoundsDTO
+            var result = new RoundsDto
             {
                 Roundid = round.Roundid,
                 Participateid = round.Participateid,
@@ -77,7 +77,7 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/rounds/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRound(int id, RoundsCreateDTO dto)
+        public async Task<IActionResult> PutRound(int id, RoundsCreateDto dto)
         {
             var round = await _context.Rounds.FindAsync(id);
             if (round == null)

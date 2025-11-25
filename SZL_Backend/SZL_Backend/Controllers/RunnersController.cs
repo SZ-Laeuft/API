@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
-using SZL_Backend.DTO;
+using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
 
@@ -20,10 +20,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/runners
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RunnersDTO>>> GetRunners()
+        public async Task<ActionResult<IEnumerable<RunnersDto>>> GetRunners()
         {
             return await _context.Runners
-                .Select(r => new RunnersDTO
+                .Select(r => new RunnersDto
                 {
                     Runnerid = r.Runnerid,
                     Firstname = r.Firstname,
@@ -34,11 +34,11 @@ namespace SZL_Backend.Controllers
 
         // GET: api/runners/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<RunnersDTO>> GetRunner(int id)
+        public async Task<ActionResult<RunnersDto>> GetRunner(int id)
         {
             var runner = await _context.Runners
                 .Where(r => r.Runnerid == id)
-                .Select(r => new RunnersDTO
+                .Select(r => new RunnersDto
                 {
                     Runnerid = r.Runnerid,
                     Firstname = r.Firstname,
@@ -54,7 +54,7 @@ namespace SZL_Backend.Controllers
 
         // POST: api/runners
         [HttpPost]
-        public async Task<ActionResult<RunnersDTO>> PostRunner(RunnersCreateDTO dto)
+        public async Task<ActionResult<RunnersDto>> PostRunner(RunnersCreateDto dto)
         {
             var runner = new Runner
             {
@@ -65,7 +65,7 @@ namespace SZL_Backend.Controllers
             _context.Runners.Add(runner);
             await _context.SaveChangesAsync();
 
-            var result = new RunnersDTO
+            var result = new RunnersDto
             {
                 Runnerid = runner.Runnerid,
                 Firstname = runner.Firstname,
@@ -77,7 +77,7 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/runners/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRunner(int id, RunnersCreateDTO dto)
+        public async Task<IActionResult> PutRunner(int id, RunnersCreateDto dto)
         {
             var runner = await _context.Runners.FindAsync(id);
             if (runner == null)
