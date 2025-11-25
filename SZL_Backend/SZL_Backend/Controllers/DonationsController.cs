@@ -8,15 +8,8 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DonationsController : ControllerBase
+    public class DonationsController(SZLDbContext context) : ControllerBase
     {
-        private readonly SZLDbContext _context;
-
-        public DonationsController(SZLDbContext context)
-        {
-            _context = context;
-        }
-
         // GET: api/donations
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<DonationsDto>), 200)]
@@ -25,7 +18,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await _context.Donations
+                var data = await context.Donations
                     .Select(d => new DonationsDto
                     {
                         Donationid = d.Donationid,
@@ -52,7 +45,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var donation = await _context.Donations
+                var donation = await context.Donations
                     .Where(d => d.Donationid == id)
                     .Select(d => new DonationsDto
                     {
@@ -92,8 +85,8 @@ namespace SZL_Backend.Controllers
                     Amount = dto.Amount
                 };
 
-                _context.Donations.Add(donation);
-                await _context.SaveChangesAsync();
+                context.Donations.Add(donation);
+                await context.SaveChangesAsync();
 
                 var result = new DonationsDto
                 {
@@ -123,14 +116,14 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var donation = await _context.Donations.FindAsync(id);
+                var donation = await context.Donations.FindAsync(id);
                 if (donation == null)
                     return NotFound();
 
                 donation.Participateid = dto.Participateid;
                 donation.Amount = dto.Amount;
 
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }
@@ -149,12 +142,12 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var donation = await _context.Donations.FindAsync(id);
+                var donation = await context.Donations.FindAsync(id);
                 if (donation == null)
                     return NotFound();
 
-                _context.Donations.Remove(donation);
-                await _context.SaveChangesAsync();
+                context.Donations.Remove(donation);
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }

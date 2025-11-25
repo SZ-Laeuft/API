@@ -8,15 +8,8 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamsController : ControllerBase
+    public class TeamsController(SZLDbContext context) : ControllerBase
     {
-        private readonly SZLDbContext _context;
-
-        public TeamsController(SZLDbContext context)
-        {
-            _context = context;
-        }
-
         // GET: api/teams
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<TeamsDto>), 200)]
@@ -25,7 +18,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await _context.Teams
+                var data = await context.Teams
                     .Select(t => new TeamsDto
                     {
                         Teamid = t.Teamid,
@@ -51,7 +44,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var team = await _context.Teams
+                var team = await context.Teams
                     .Where(t => t.Teamid == id)
                     .Select(t => new TeamsDto
                     {
@@ -88,8 +81,8 @@ namespace SZL_Backend.Controllers
                     Name = dto.Name
                 };
 
-                _context.Teams.Add(team);
-                await _context.SaveChangesAsync();
+                context.Teams.Add(team);
+                await context.SaveChangesAsync();
 
                 var result = new TeamsDto
                 {
@@ -118,12 +111,12 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var team = await _context.Teams.FindAsync(id);
+                var team = await context.Teams.FindAsync(id);
                 if (team == null)
                     return NotFound();
 
                 team.Name = dto.Name;
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }
@@ -142,12 +135,12 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var team = await _context.Teams.FindAsync(id);
+                var team = await context.Teams.FindAsync(id);
                 if (team == null)
                     return NotFound();
 
-                _context.Teams.Remove(team);
-                await _context.SaveChangesAsync();
+                context.Teams.Remove(team);
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }

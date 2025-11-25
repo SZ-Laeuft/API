@@ -3,22 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
-using static SZL_Backend.Dto.CategoriesDto;
 
 namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategorysController : ControllerBase
+    public class CategoriesController(SZLDbContext context) : ControllerBase
     {
-        private readonly SZLDbContext _context;
-
-        public CategorysController(SZLDbContext context)
-        {
-            _context = context;
-        }
-
-     
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<CategoriesDto>), 200)] 
         [ProducesResponseType(500)] 
@@ -26,7 +17,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await _context.Categories
+                var data = await context.Categories
                     .Select(c => new CategoriesDto
                     {
                         Categoryid = c.Categoryid,
@@ -52,7 +43,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var category = await _context.Categories
+                var category = await context.Categories
                     .Select(c => new CategoriesDto
                     {
                         Categoryid = c.Categoryid,
@@ -83,13 +74,13 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var exists = await _context.Categories.AnyAsync(c => c.Name == dto.Name);
+                var exists = await context.Categories.AnyAsync(c => c.Name == dto.Name);
                 if (exists)
                     return Conflict("Category with this name already exists");
 
                 var category = new Category { Name = dto.Name };
-                _context.Categories.Add(category);
-                await _context.SaveChangesAsync();
+                context.Categories.Add(category);
+                await context.SaveChangesAsync();
 
                 var result = new CategoriesDto
                 {
@@ -117,12 +108,12 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var category = await _context.Categories.FindAsync(id);
+                var category = await context.Categories.FindAsync(id);
                 if (category == null)
                     return NotFound(); 
 
                 category.Name = dto.Name;
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }
@@ -140,12 +131,12 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var category = await _context.Categories.FindAsync(id);
+                var category = await context.Categories.FindAsync(id);
                 if (category == null)
                     return NotFound(); 
 
-                _context.Categories.Remove(category);
-                await _context.SaveChangesAsync();
+                context.Categories.Remove(category);
+                await context.SaveChangesAsync();
 
                 return NoContent(); 
             }

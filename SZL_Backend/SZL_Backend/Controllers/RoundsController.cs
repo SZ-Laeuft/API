@@ -8,15 +8,8 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RoundsController : ControllerBase
+    public class RoundsController(SZLDbContext context) : ControllerBase
     {
-        private readonly SZLDbContext _context;
-
-        public RoundsController(SZLDbContext context)
-        {
-            _context = context;
-        }
-
         // GET: api/rounds
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<RoundsDto>), 200)]
@@ -25,7 +18,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await _context.Rounds
+                var data = await context.Rounds
                     .Select(r => new RoundsDto
                     {
                         Roundid = r.Roundid,
@@ -52,7 +45,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var round = await _context.Rounds
+                var round = await context.Rounds
                     .Where(r => r.Roundid == id)
                     .Select(r => new RoundsDto
                     {
@@ -91,8 +84,8 @@ namespace SZL_Backend.Controllers
                     Roundtimestamp = dto.Roundtimestamp
                 };
 
-                _context.Rounds.Add(round);
-                await _context.SaveChangesAsync();
+                context.Rounds.Add(round);
+                await context.SaveChangesAsync();
 
                 var result = new RoundsDto
                 {
@@ -122,14 +115,14 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var round = await _context.Rounds.FindAsync(id);
+                var round = await context.Rounds.FindAsync(id);
                 if (round == null)
                     return NotFound();
 
                 round.Participateid = dto.Participateid;
                 round.Roundtimestamp = dto.Roundtimestamp;
 
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }
@@ -148,12 +141,12 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var round = await _context.Rounds.FindAsync(id);
+                var round = await context.Rounds.FindAsync(id);
                 if (round == null)
                     return NotFound();
 
-                _context.Rounds.Remove(round);
-                await _context.SaveChangesAsync();
+                context.Rounds.Remove(round);
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }

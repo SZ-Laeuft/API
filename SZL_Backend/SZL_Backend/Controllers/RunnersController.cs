@@ -8,15 +8,8 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RunnersController : ControllerBase
+    public class RunnersController(SZLDbContext context) : ControllerBase
     {
-        private readonly SZLDbContext _context;
-
-        public RunnersController(SZLDbContext context)
-        {
-            _context = context;
-        }
-
         // GET: api/runners
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<RunnersDto>), 200)]
@@ -25,7 +18,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await _context.Runners
+                var data = await context.Runners
                     .Select(r => new RunnersDto
                     {
                         Runnerid = r.Runnerid,
@@ -52,7 +45,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var runner = await _context.Runners
+                var runner = await context.Runners
                     .Where(r => r.Runnerid == id)
                     .Select(r => new RunnersDto
                     {
@@ -91,8 +84,8 @@ namespace SZL_Backend.Controllers
                     Lastname = dto.Lastname
                 };
 
-                _context.Runners.Add(runner);
-                await _context.SaveChangesAsync();
+                context.Runners.Add(runner);
+                await context.SaveChangesAsync();
 
                 var result = new RunnersDto
                 {
@@ -122,14 +115,14 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var runner = await _context.Runners.FindAsync(id);
+                var runner = await context.Runners.FindAsync(id);
                 if (runner == null)
                     return NotFound();
 
                 runner.Firstname = dto.Firstname;
                 runner.Lastname = dto.Lastname;
 
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }
@@ -148,12 +141,12 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var runner = await _context.Runners.FindAsync(id);
+                var runner = await context.Runners.FindAsync(id);
                 if (runner == null)
                     return NotFound();
 
-                _context.Runners.Remove(runner);
-                await _context.SaveChangesAsync();
+                context.Runners.Remove(runner);
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }

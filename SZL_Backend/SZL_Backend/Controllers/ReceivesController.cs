@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SZL_Backend.Dto;
-using System.Collections.Generic;
-using System.Linq;
+
 
 namespace SZL_Backend.Controllers
 {
@@ -9,7 +8,7 @@ namespace SZL_Backend.Controllers
     [Route("api/[controller]")]
     public class ReceivesController : ControllerBase
     {
-        private static readonly List<ReceivesDto> _receives = new List<ReceivesDto>();
+        private static readonly List<ReceivesDto> Receives = new List<ReceivesDto>();
 
         // GET: api/receives
         [HttpGet]
@@ -19,7 +18,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                return Ok(_receives);
+                return Ok(Receives);
             }
             catch
             {
@@ -36,7 +35,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var receive = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
+                var receive = Receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
                 if (receive == null)
                     return NotFound();
 
@@ -61,10 +60,10 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                if (_receives.Any(r => r.Giftid == dto.Giftid && r.Participateid == dto.Participateid))
+                if (Receives.Any(r => r.Giftid == dto.Giftid && r.Participateid == dto.Participateid))
                     return Conflict("This record already exists.");
 
-                _receives.Add(dto);
+                Receives.Add(dto);
                 return CreatedAtAction(nameof(Get), new { giftId = dto.Giftid, participateId = dto.Participateid }, dto);
             }
             catch
@@ -86,7 +85,7 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var receive = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
+                var receive = Receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
                 if (receive == null)
                     return NotFound();
 
@@ -110,11 +109,11 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var receive = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
+                var receive = Receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
                 if (receive == null)
                     return NotFound();
 
-                _receives.Remove(receive);
+                Receives.Remove(receive);
                 return NoContent();
             }
             catch

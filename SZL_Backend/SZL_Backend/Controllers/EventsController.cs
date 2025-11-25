@@ -8,15 +8,8 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EventsController : ControllerBase
+    public class EventsController(SZLDbContext context) : ControllerBase
     {
-        private readonly SZLDbContext _context;
-
-        public EventsController(SZLDbContext context)
-        {
-            _context = context;
-        }
-
         // GET: api/events
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<EventsDto>), 200)]
@@ -25,7 +18,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await _context.Events
+                var data = await context.Events
                     .Select(e => new EventsDto
                     {
                         Eventid = e.Eventid,
@@ -56,7 +49,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var evt = await _context.Events
+                var evt = await context.Events
                     .Where(e => e.Eventid == id)
                     .Select(e => new EventsDto
                     {
@@ -103,8 +96,8 @@ namespace SZL_Backend.Controllers
                     Categoryid = dto.Categoryid
                 };
 
-                _context.Events.Add(evt);
-                await _context.SaveChangesAsync();
+                context.Events.Add(evt);
+                await context.SaveChangesAsync();
 
                 var result = new EventsDto
                 {
@@ -138,7 +131,7 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var evt = await _context.Events.FindAsync(id);
+                var evt = await context.Events.FindAsync(id);
                 if (evt == null)
                     return NotFound();
 
@@ -149,7 +142,7 @@ namespace SZL_Backend.Controllers
                 evt.Endtime = dto.Endtime;
                 evt.Categoryid = dto.Categoryid;
 
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }
@@ -168,12 +161,12 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var evt = await _context.Events.FindAsync(id);
+                var evt = await context.Events.FindAsync(id);
                 if (evt == null)
                     return NotFound();
 
-                _context.Events.Remove(evt);
-                await _context.SaveChangesAsync();
+                context.Events.Remove(evt);
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }

@@ -8,15 +8,8 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GiftsController : ControllerBase
+    public class GiftsController(SZLDbContext context) : ControllerBase
     {
-        private readonly SZLDbContext _context;
-
-        public GiftsController(SZLDbContext context)
-        {
-            _context = context;
-        }
-
         // GET: api/gifts
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<GiftsDto>), 200)]
@@ -25,7 +18,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await _context.Gifts
+                var data = await context.Gifts
                     .Select(g => new GiftsDto
                     {
                         Giftid = g.Giftid,
@@ -52,7 +45,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var gift = await _context.Gifts
+                var gift = await context.Gifts
                     .Where(g => g.Giftid == id)
                     .Select(g => new GiftsDto
                     {
@@ -91,8 +84,8 @@ namespace SZL_Backend.Controllers
                     Requirement = dto.Requirement
                 };
 
-                _context.Gifts.Add(gift);
-                await _context.SaveChangesAsync();
+                context.Gifts.Add(gift);
+                await context.SaveChangesAsync();
 
                 var result = new GiftsDto
                 {
@@ -122,14 +115,14 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var gift = await _context.Gifts.FindAsync(id);
+                var gift = await context.Gifts.FindAsync(id);
                 if (gift == null)
                     return NotFound();
 
                 gift.Name = dto.Name;
                 gift.Requirement = dto.Requirement;
 
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }
@@ -148,12 +141,12 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var gift = await _context.Gifts.FindAsync(id);
+                var gift = await context.Gifts.FindAsync(id);
                 if (gift == null)
                     return NotFound();
 
-                _context.Gifts.Remove(gift);
-                await _context.SaveChangesAsync();
+                context.Gifts.Remove(gift);
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }

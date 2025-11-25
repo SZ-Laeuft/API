@@ -2,7 +2,7 @@ namespace SZL_Backend.Dto
 {
     public class CategoriesDto
     {
-        public int Categoryid { get; init; }
+        public int Categoryid { get; set; }
 
         public string Name { get; set; } = null!;
     }

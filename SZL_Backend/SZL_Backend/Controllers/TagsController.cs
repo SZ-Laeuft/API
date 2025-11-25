@@ -8,15 +8,8 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TagsController : ControllerBase
+    public class TagsController(SZLDbContext context) : ControllerBase
     {
-        private readonly SZLDbContext _context;
-
-        public TagsController(SZLDbContext context)
-        {
-            _context = context;
-        }
-
         // GET: api/tags
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<TagsDto>), 200)]
@@ -25,7 +18,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await _context.Tags
+                var data = await context.Tags
                     .Select(t => new TagsDto
                     {
                         Tagid = t.Tagid,
@@ -51,7 +44,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var tag = await _context.Tags
+                var tag = await context.Tags
                     .Where(t => t.Tagid == id)
                     .Select(t => new TagsDto
                     {
@@ -88,8 +81,8 @@ namespace SZL_Backend.Controllers
                     Status = dto.Status
                 };
 
-                _context.Tags.Add(tag);
-                await _context.SaveChangesAsync();
+                context.Tags.Add(tag);
+                await context.SaveChangesAsync();
 
                 var result = new TagsDto
                 {
@@ -118,12 +111,12 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var tag = await _context.Tags.FindAsync(id);
+                var tag = await context.Tags.FindAsync(id);
                 if (tag == null)
                     return NotFound();
 
                 tag.Status = dto.Status;
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }
@@ -142,12 +135,12 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var tag = await _context.Tags.FindAsync(id);
+                var tag = await context.Tags.FindAsync(id);
                 if (tag == null)
                     return NotFound();
 
-                _context.Tags.Remove(tag);
-                await _context.SaveChangesAsync();
+                context.Tags.Remove(tag);
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }
