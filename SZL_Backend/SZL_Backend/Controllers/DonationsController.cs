@@ -19,89 +19,149 @@ namespace SZL_Backend.Controllers
 
         // GET: api/donations
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DonationsDto>>> GetDonations()
+        [ProducesResponseType(typeof(IEnumerable<DonationsDto>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetDonations()
         {
-            return await _context.Donations
-                .Select(d => new DonationsDto
-                {
-                    Donationid = d.Donationid,
-                    Participateid = d.Participateid,
-                    Amount = d.Amount
-                })
-                .ToListAsync();
+            try
+            {
+                var data = await _context.Donations
+                    .Select(d => new DonationsDto
+                    {
+                        Donationid = d.Donationid,
+                        Participateid = d.Participateid,
+                        Amount = d.Amount
+                    })
+                    .OrderBy(d => d.Donationid)
+                    .ToListAsync();
+
+                return Ok(data);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // GET: api/donations/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<DonationsDto>> GetDonation(int id)
+        [ProducesResponseType(typeof(DonationsDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetDonation(int id)
         {
-            var donation = await _context.Donations
-                .Where(d => d.Donationid == id)
-                .Select(d => new DonationsDto
-                {
-                    Donationid = d.Donationid,
-                    Participateid = d.Participateid,
-                    Amount = d.Amount
-                })
-                .FirstOrDefaultAsync();
+            try
+            {
+                var donation = await _context.Donations
+                    .Where(d => d.Donationid == id)
+                    .Select(d => new DonationsDto
+                    {
+                        Donationid = d.Donationid,
+                        Participateid = d.Participateid,
+                        Amount = d.Amount
+                    })
+                    .FirstOrDefaultAsync();
 
-            if (donation == null)
-                return NotFound();
+                if (donation == null)
+                    return NotFound();
 
-            return donation;
+                return Ok(donation);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // POST: api/donations
         [HttpPost]
-        public async Task<ActionResult<DonationsDto>> PostDonation(DonationsCreateDto dto)
+        [ProducesResponseType(typeof(DonationsDto), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> PostDonation(DonationsCreateDto dto)
         {
-            var donation = new Donation
+            if (dto.Amount <= 0)
+                return BadRequest("Amount must be greater than zero");
+
+            try
             {
-                Participateid = dto.Participateid,
-                Amount = dto.Amount
-            };
+                var donation = new Donation
+                {
+                    Participateid = dto.Participateid,
+                    Amount = dto.Amount
+                };
 
-            _context.Donations.Add(donation);
-            await _context.SaveChangesAsync();
+                _context.Donations.Add(donation);
+                await _context.SaveChangesAsync();
 
-            var result = new DonationsDto
+                var result = new DonationsDto
+                {
+                    Donationid = donation.Donationid,
+                    Participateid = donation.Participateid,
+                    Amount = donation.Amount
+                };
+
+                return CreatedAtAction(nameof(GetDonation), new { id = donation.Donationid }, result);
+            }
+            catch
             {
-                Donationid = donation.Donationid,
-                Participateid = donation.Participateid,
-                Amount = donation.Amount
-            };
-
-            return CreatedAtAction(nameof(GetDonation), new { id = donation.Donationid }, result);
+                return StatusCode(500);
+            }
         }
 
         // PUT: api/donations/5
         [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> PutDonation(int id, DonationsCreateDto dto)
         {
-            var donation = await _context.Donations.FindAsync(id);
-            if (donation == null)
-                return NotFound();
+            if (dto.Amount <= 0)
+                return BadRequest("Amount must be greater than zero");
 
-            donation.Participateid = dto.Participateid;
-            donation.Amount = dto.Amount;
+            try
+            {
+                var donation = await _context.Donations.FindAsync(id);
+                if (donation == null)
+                    return NotFound();
 
-            await _context.SaveChangesAsync();
+                donation.Participateid = dto.Participateid;
+                donation.Amount = dto.Amount;
 
-            return NoContent();
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500);
+            }
         }
 
         // DELETE: api/donations/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> DeleteDonation(int id)
         {
-            var donation = await _context.Donations.FindAsync(id);
-            if (donation == null)
-                return NotFound();
+            try
+            {
+                var donation = await _context.Donations.FindAsync(id);
+                if (donation == null)
+                    return NotFound();
 
-            _context.Donations.Remove(donation);
-            await _context.SaveChangesAsync();
+                _context.Donations.Remove(donation);
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
     }
 }

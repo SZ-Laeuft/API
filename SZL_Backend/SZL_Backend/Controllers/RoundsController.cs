@@ -4,7 +4,6 @@ using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
-
 namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
@@ -20,89 +19,148 @@ namespace SZL_Backend.Controllers
 
         // GET: api/rounds
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RoundsDto>>> GetRounds()
+        [ProducesResponseType(typeof(IEnumerable<RoundsDto>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetRounds()
         {
-            return await _context.Rounds
-                .Select(r => new RoundsDto
-                {
-                    Roundid = r.Roundid,
-                    Participateid = r.Participateid,
-                    Roundtimestamp = r.Roundtimestamp
-                })
-                .ToListAsync();
+            try
+            {
+                var data = await _context.Rounds
+                    .Select(r => new RoundsDto
+                    {
+                        Roundid = r.Roundid,
+                        Participateid = r.Participateid,
+                        Roundtimestamp = r.Roundtimestamp
+                    })
+                    .OrderBy(r => r.Roundid)
+                    .ToListAsync();
+
+                return Ok(data);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // GET: api/rounds/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<RoundsDto>> GetRound(int id)
+        [ProducesResponseType(typeof(RoundsDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetRound(int id)
         {
-            var round = await _context.Rounds
-                .Where(r => r.Roundid == id)
-                .Select(r => new RoundsDto
-                {
-                    Roundid = r.Roundid,
-                    Participateid = r.Participateid,
-                    Roundtimestamp = r.Roundtimestamp
-                })
-                .FirstOrDefaultAsync();
+            try
+            {
+                var round = await _context.Rounds
+                    .Where(r => r.Roundid == id)
+                    .Select(r => new RoundsDto
+                    {
+                        Roundid = r.Roundid,
+                        Participateid = r.Participateid,
+                        Roundtimestamp = r.Roundtimestamp
+                    })
+                    .FirstOrDefaultAsync();
 
-            if (round == null)
-                return NotFound();
+                if (round == null)
+                    return NotFound();
 
-            return round;
+                return Ok(round);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // POST: api/rounds
         [HttpPost]
-        public async Task<ActionResult<RoundsDto>> PostRound(RoundsCreateDto dto)
+        [ProducesResponseType(typeof(RoundsDto), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> PostRound(RoundsCreateDto dto)
         {
-            var round = new Round
+            if (dto.Participateid <= 0)
+                return BadRequest("ParticipateId must be greater than zero");
+
+            try
             {
-                Participateid = dto.Participateid,
-                Roundtimestamp = dto.Roundtimestamp
-            };
+                var round = new Round
+                {
+                    Participateid = dto.Participateid,
+                    Roundtimestamp = dto.Roundtimestamp
+                };
 
-            _context.Rounds.Add(round);
-            await _context.SaveChangesAsync();
+                _context.Rounds.Add(round);
+                await _context.SaveChangesAsync();
 
-            var result = new RoundsDto
+                var result = new RoundsDto
+                {
+                    Roundid = round.Roundid,
+                    Participateid = round.Participateid,
+                    Roundtimestamp = round.Roundtimestamp
+                };
+
+                return CreatedAtAction(nameof(GetRound), new { id = round.Roundid }, result);
+            }
+            catch
             {
-                Roundid = round.Roundid,
-                Participateid = round.Participateid,
-                Roundtimestamp = round.Roundtimestamp
-            };
-
-            return CreatedAtAction(nameof(GetRound), new { id = round.Roundid }, result);
+                return StatusCode(500);
+            }
         }
 
         // PUT: api/rounds/5
         [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> PutRound(int id, RoundsCreateDto dto)
         {
-            var round = await _context.Rounds.FindAsync(id);
-            if (round == null)
-                return NotFound();
+            if (dto.Participateid <= 0)
+                return BadRequest("ParticipateId must be greater than zero");
 
-            round.Participateid = dto.Participateid;
-            round.Roundtimestamp = dto.Roundtimestamp;
+            try
+            {
+                var round = await _context.Rounds.FindAsync(id);
+                if (round == null)
+                    return NotFound();
 
-            await _context.SaveChangesAsync();
+                round.Participateid = dto.Participateid;
+                round.Roundtimestamp = dto.Roundtimestamp;
 
-            return NoContent();
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500);
+            }
         }
 
         // DELETE: api/rounds/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> DeleteRound(int id)
         {
-            var round = await _context.Rounds.FindAsync(id);
-            if (round == null)
-                return NotFound();
+            try
+            {
+                var round = await _context.Rounds.FindAsync(id);
+                if (round == null)
+                    return NotFound();
 
-            _context.Rounds.Remove(round);
-            await _context.SaveChangesAsync();
+                _context.Rounds.Remove(round);
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
     }
 }

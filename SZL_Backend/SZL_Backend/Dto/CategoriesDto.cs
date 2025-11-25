@@ -1,6 +1,6 @@
 namespace SZL_Backend.Dto
 {
-    public class CategorysDto
+    public class CategoriesDto
     {
         public int Categoryid { get; init; }
 

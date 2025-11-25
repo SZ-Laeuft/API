@@ -4,7 +4,6 @@ using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
-
 namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
@@ -20,89 +19,148 @@ namespace SZL_Backend.Controllers
 
         // GET: api/runners
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RunnersDto>>> GetRunners()
+        [ProducesResponseType(typeof(IEnumerable<RunnersDto>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetRunners()
         {
-            return await _context.Runners
-                .Select(r => new RunnersDto
-                {
-                    Runnerid = r.Runnerid,
-                    Firstname = r.Firstname,
-                    Lastname = r.Lastname
-                })
-                .ToListAsync();
+            try
+            {
+                var data = await _context.Runners
+                    .Select(r => new RunnersDto
+                    {
+                        Runnerid = r.Runnerid,
+                        Firstname = r.Firstname,
+                        Lastname = r.Lastname
+                    })
+                    .OrderBy(r => r.Runnerid)
+                    .ToListAsync();
+
+                return Ok(data);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // GET: api/runners/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<RunnersDto>> GetRunner(int id)
+        [ProducesResponseType(typeof(RunnersDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetRunner(int id)
         {
-            var runner = await _context.Runners
-                .Where(r => r.Runnerid == id)
-                .Select(r => new RunnersDto
-                {
-                    Runnerid = r.Runnerid,
-                    Firstname = r.Firstname,
-                    Lastname = r.Lastname
-                })
-                .FirstOrDefaultAsync();
+            try
+            {
+                var runner = await _context.Runners
+                    .Where(r => r.Runnerid == id)
+                    .Select(r => new RunnersDto
+                    {
+                        Runnerid = r.Runnerid,
+                        Firstname = r.Firstname,
+                        Lastname = r.Lastname
+                    })
+                    .FirstOrDefaultAsync();
 
-            if (runner == null)
-                return NotFound();
+                if (runner == null)
+                    return NotFound();
 
-            return runner;
+                return Ok(runner);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // POST: api/runners
         [HttpPost]
-        public async Task<ActionResult<RunnersDto>> PostRunner(RunnersCreateDto dto)
+        [ProducesResponseType(typeof(RunnersDto), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> PostRunner(RunnersCreateDto dto)
         {
-            var runner = new Runner
+            if (string.IsNullOrWhiteSpace(dto.Firstname) || string.IsNullOrWhiteSpace(dto.Lastname))
+                return BadRequest("Firstname and Lastname are required");
+
+            try
             {
-                Firstname = dto.Firstname,
-                Lastname = dto.Lastname
-            };
+                var runner = new Runner
+                {
+                    Firstname = dto.Firstname,
+                    Lastname = dto.Lastname
+                };
 
-            _context.Runners.Add(runner);
-            await _context.SaveChangesAsync();
+                _context.Runners.Add(runner);
+                await _context.SaveChangesAsync();
 
-            var result = new RunnersDto
+                var result = new RunnersDto
+                {
+                    Runnerid = runner.Runnerid,
+                    Firstname = runner.Firstname,
+                    Lastname = runner.Lastname
+                };
+
+                return CreatedAtAction(nameof(GetRunner), new { id = runner.Runnerid }, result);
+            }
+            catch
             {
-                Runnerid = runner.Runnerid,
-                Firstname = runner.Firstname,
-                Lastname = runner.Lastname
-            };
-
-            return CreatedAtAction(nameof(GetRunner), new { id = runner.Runnerid }, result);
+                return StatusCode(500);
+            }
         }
 
         // PUT: api/runners/5
         [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> PutRunner(int id, RunnersCreateDto dto)
         {
-            var runner = await _context.Runners.FindAsync(id);
-            if (runner == null)
-                return NotFound();
+            if (string.IsNullOrWhiteSpace(dto.Firstname) || string.IsNullOrWhiteSpace(dto.Lastname))
+                return BadRequest("Firstname and Lastname are required");
 
-            runner.Firstname = dto.Firstname;
-            runner.Lastname = dto.Lastname;
+            try
+            {
+                var runner = await _context.Runners.FindAsync(id);
+                if (runner == null)
+                    return NotFound();
 
-            await _context.SaveChangesAsync();
+                runner.Firstname = dto.Firstname;
+                runner.Lastname = dto.Lastname;
 
-            return NoContent();
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500);
+            }
         }
 
         // DELETE: api/runners/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> DeleteRunner(int id)
         {
-            var runner = await _context.Runners.FindAsync(id);
-            if (runner == null)
-                return NotFound();
+            try
+            {
+                var runner = await _context.Runners.FindAsync(id);
+                if (runner == null)
+                    return NotFound();
 
-            _context.Runners.Remove(runner);
-            await _context.SaveChangesAsync();
+                _context.Runners.Remove(runner);
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
     }
 }

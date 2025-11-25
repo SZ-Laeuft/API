@@ -19,89 +19,148 @@ namespace SZL_Backend.Controllers
 
         // GET: api/gifts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GiftsDto>>> GetGifts()
+        [ProducesResponseType(typeof(IEnumerable<GiftsDto>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetGifts()
         {
-            return await _context.Gifts
-                .Select(g => new GiftsDto
-                {
-                    Giftid = g.Giftid,
-                    Name = g.Name,
-                    Requirement = g.Requirement
-                })
-                .ToListAsync();
+            try
+            {
+                var data = await _context.Gifts
+                    .Select(g => new GiftsDto
+                    {
+                        Giftid = g.Giftid,
+                        Name = g.Name,
+                        Requirement = g.Requirement
+                    })
+                    .OrderBy(g => g.Giftid)
+                    .ToListAsync();
+
+                return Ok(data);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // GET: api/gifts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GiftsDto>> GetGift(int id)
+        [ProducesResponseType(typeof(GiftsDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetGift(int id)
         {
-            var gift = await _context.Gifts
-                .Where(g => g.Giftid == id)
-                .Select(g => new GiftsDto
-                {
-                    Giftid = g.Giftid,
-                    Name = g.Name,
-                    Requirement = g.Requirement
-                })
-                .FirstOrDefaultAsync();
+            try
+            {
+                var gift = await _context.Gifts
+                    .Where(g => g.Giftid == id)
+                    .Select(g => new GiftsDto
+                    {
+                        Giftid = g.Giftid,
+                        Name = g.Name,
+                        Requirement = g.Requirement
+                    })
+                    .FirstOrDefaultAsync();
 
-            if (gift == null)
-                return NotFound();
+                if (gift == null)
+                    return NotFound();
 
-            return gift;
+                return Ok(gift);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // POST: api/gifts
         [HttpPost]
-        public async Task<ActionResult<GiftsDto>> PostGift(GiftsCreateDto dto)
+        [ProducesResponseType(typeof(GiftsDto), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> PostGift(GiftsCreateDto dto)
         {
-            var gift = new Gift
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                return BadRequest("Name is required");
+
+            try
             {
-                Name = dto.Name,
-                Requirement = dto.Requirement
-            };
+                var gift = new Gift
+                {
+                    Name = dto.Name,
+                    Requirement = dto.Requirement
+                };
 
-            _context.Gifts.Add(gift);
-            await _context.SaveChangesAsync();
+                _context.Gifts.Add(gift);
+                await _context.SaveChangesAsync();
 
-            var result = new GiftsDto
+                var result = new GiftsDto
+                {
+                    Giftid = gift.Giftid,
+                    Name = gift.Name,
+                    Requirement = gift.Requirement
+                };
+
+                return CreatedAtAction(nameof(GetGift), new { id = gift.Giftid }, result);
+            }
+            catch
             {
-                Giftid = gift.Giftid,
-                Name = gift.Name,
-                Requirement = gift.Requirement
-            };
-
-            return CreatedAtAction(nameof(GetGift), new { id = gift.Giftid }, result);
+                return StatusCode(500);
+            }
         }
 
         // PUT: api/gifts/5
         [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> PutGift(int id, GiftsCreateDto dto)
         {
-            var gift = await _context.Gifts.FindAsync(id);
-            if (gift == null)
-                return NotFound();
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                return BadRequest("Name is required");
 
-            gift.Name = dto.Name;
-            gift.Requirement = dto.Requirement;
+            try
+            {
+                var gift = await _context.Gifts.FindAsync(id);
+                if (gift == null)
+                    return NotFound();
 
-            await _context.SaveChangesAsync();
+                gift.Name = dto.Name;
+                gift.Requirement = dto.Requirement;
 
-            return NoContent();
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500);
+            }
         }
 
         // DELETE: api/gifts/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> DeleteGift(int id)
         {
-            var gift = await _context.Gifts.FindAsync(id);
-            if (gift == null)
-                return NotFound();
+            try
+            {
+                var gift = await _context.Gifts.FindAsync(id);
+                if (gift == null)
+                    return NotFound();
 
-            _context.Gifts.Remove(gift);
-            await _context.SaveChangesAsync();
+                _context.Gifts.Remove(gift);
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
     }
 }

@@ -4,7 +4,6 @@ using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
-
 namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
@@ -20,99 +19,158 @@ namespace SZL_Backend.Controllers
 
         // GET: api/participates
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ParticipatesDto>>> GetParticipates()
+        [ProducesResponseType(typeof(IEnumerable<ParticipatesDto>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetParticipates()
         {
-            return await _context.Participates
-                .Select(p => new ParticipatesDto
-                {
-                    Participateid = p.Participateid,
-                    Teamid = p.Teamid,
-                    Tagid = p.Tagid,
-                    Runnerid = p.Runnerid,
-                    Eventid = p.Eventid
-                })
-                .ToListAsync();
+            try
+            {
+                var data = await _context.Participates
+                    .Select(p => new ParticipatesDto
+                    {
+                        Participateid = p.Participateid,
+                        Teamid = p.Teamid,
+                        Tagid = p.Tagid,
+                        Runnerid = p.Runnerid,
+                        Eventid = p.Eventid
+                    })
+                    .OrderBy(p => p.Participateid)
+                    .ToListAsync();
+
+                return Ok(data);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // GET: api/participates/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ParticipatesDto>> GetParticipate(int id)
+        [ProducesResponseType(typeof(ParticipatesDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetParticipate(int id)
         {
-            var participate = await _context.Participates
-                .Where(p => p.Participateid == id)
-                .Select(p => new ParticipatesDto
-                {
-                    Participateid = p.Participateid,
-                    Teamid = p.Teamid,
-                    Tagid = p.Tagid,
-                    Runnerid = p.Runnerid,
-                    Eventid = p.Eventid
-                })
-                .FirstOrDefaultAsync();
+            try
+            {
+                var participate = await _context.Participates
+                    .Where(p => p.Participateid == id)
+                    .Select(p => new ParticipatesDto
+                    {
+                        Participateid = p.Participateid,
+                        Teamid = p.Teamid,
+                        Tagid = p.Tagid,
+                        Runnerid = p.Runnerid,
+                        Eventid = p.Eventid
+                    })
+                    .FirstOrDefaultAsync();
 
-            if (participate == null)
-                return NotFound();
+                if (participate == null)
+                    return NotFound();
 
-            return participate;
+                return Ok(participate);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // POST: api/participates
         [HttpPost]
-        public async Task<ActionResult<ParticipatesDto>> PostParticipate(ParticipatesCreateDto dto)
+        [ProducesResponseType(typeof(ParticipatesDto), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> PostParticipate(ParticipatesCreateDto dto)
         {
-            var participate = new Participate
+            if (dto.Teamid <= 0 || dto.Eventid <= 0)
+                return BadRequest("TeamId and EventId must be valid");
+
+            try
             {
-                Teamid = dto.Teamid,
-                Tagid = dto.Tagid,
-                Runnerid = dto.Runnerid,
-                Eventid = dto.Eventid
-            };
+                var participate = new Participate
+                {
+                    Teamid = dto.Teamid,
+                    Tagid = dto.Tagid,
+                    Runnerid = dto.Runnerid,
+                    Eventid = dto.Eventid
+                };
 
-            _context.Participates.Add(participate);
-            await _context.SaveChangesAsync();
+                _context.Participates.Add(participate);
+                await _context.SaveChangesAsync();
 
-            var result = new ParticipatesDto
+                var result = new ParticipatesDto
+                {
+                    Participateid = participate.Participateid,
+                    Teamid = participate.Teamid,
+                    Tagid = participate.Tagid,
+                    Runnerid = participate.Runnerid,
+                    Eventid = participate.Eventid
+                };
+
+                return CreatedAtAction(nameof(GetParticipate), new { id = participate.Participateid }, result);
+            }
+            catch
             {
-                Participateid = participate.Participateid,
-                Teamid = participate.Teamid,
-                Tagid = participate.Tagid,
-                Runnerid = participate.Runnerid,
-                Eventid = participate.Eventid
-            };
-
-            return CreatedAtAction(nameof(GetParticipate), new { id = participate.Participateid }, result);
+                return StatusCode(500);
+            }
         }
 
         // PUT: api/participates/5
         [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> PutParticipate(int id, ParticipatesCreateDto dto)
         {
-            var participate = await _context.Participates.FindAsync(id);
-            if (participate == null)
-                return NotFound();
+            if (dto.Teamid <= 0 || dto.Eventid <= 0)
+                return BadRequest("TeamId and EventId must be valid");
 
-            participate.Teamid = dto.Teamid;
-            participate.Tagid = dto.Tagid;
-            participate.Runnerid = dto.Runnerid;
-            participate.Eventid = dto.Eventid;
+            try
+            {
+                var participate = await _context.Participates.FindAsync(id);
+                if (participate == null)
+                    return NotFound();
 
-            await _context.SaveChangesAsync();
+                participate.Teamid = dto.Teamid;
+                participate.Tagid = dto.Tagid;
+                participate.Runnerid = dto.Runnerid;
+                participate.Eventid = dto.Eventid;
 
-            return NoContent();
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500);
+            }
         }
 
         // DELETE: api/participates/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> DeleteParticipate(int id)
         {
-            var participate = await _context.Participates.FindAsync(id);
-            if (participate == null)
-                return NotFound();
+            try
+            {
+                var participate = await _context.Participates.FindAsync(id);
+                if (participate == null)
+                    return NotFound();
 
-            _context.Participates.Remove(participate);
-            await _context.SaveChangesAsync();
+                _context.Participates.Remove(participate);
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
     }
 }

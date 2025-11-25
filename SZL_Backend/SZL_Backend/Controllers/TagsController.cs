@@ -19,84 +19,142 @@ namespace SZL_Backend.Controllers
 
         // GET: api/tags
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TagsDto>>> GetTags()
+        [ProducesResponseType(typeof(IEnumerable<TagsDto>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetTags()
         {
-            return await _context.Tags
-                .Select(t => new TagsDto
-                {
-                    Tagid = t.Tagid,
-                    Status = t.Status
-                })
-                .ToListAsync();
+            try
+            {
+                var data = await _context.Tags
+                    .Select(t => new TagsDto
+                    {
+                        Tagid = t.Tagid,
+                        Status = t.Status
+                    })
+                    .OrderBy(t => t.Tagid)
+                    .ToListAsync();
+
+                return Ok(data);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // GET: api/tags/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TagsDto>> GetTag(int id)
+        [ProducesResponseType(typeof(TagsDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetTag(int id)
         {
-            var tag = await _context.Tags
-                .Where(t => t.Tagid == id)
-                .Select(t => new TagsDto
-                {
-                    Tagid = t.Tagid,
-                    Status = t.Status
-                })
-                .FirstOrDefaultAsync();
+            try
+            {
+                var tag = await _context.Tags
+                    .Where(t => t.Tagid == id)
+                    .Select(t => new TagsDto
+                    {
+                        Tagid = t.Tagid,
+                        Status = t.Status
+                    })
+                    .FirstOrDefaultAsync();
 
-            if (tag == null)
-                return NotFound();
+                if (tag == null)
+                    return NotFound();
 
-            return tag;
+                return Ok(tag);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // POST: api/tags
         [HttpPost]
-        public async Task<ActionResult<TagsDto>> PostTag(TagsCreateDto dto)
+        [ProducesResponseType(typeof(TagsDto), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> PostTag(TagsCreateDto dto)
         {
-            var tag = new Tag
+            if (string.IsNullOrWhiteSpace(dto.Status))
+                return BadRequest("Status is required");
+
+            try
             {
-                Status = dto.Status
-            };
+                var tag = new Tag
+                {
+                    Status = dto.Status
+                };
 
-            _context.Tags.Add(tag);
-            await _context.SaveChangesAsync();
+                _context.Tags.Add(tag);
+                await _context.SaveChangesAsync();
 
-            var result = new TagsDto
+                var result = new TagsDto
+                {
+                    Tagid = tag.Tagid,
+                    Status = tag.Status
+                };
+
+                return CreatedAtAction(nameof(GetTag), new { id = tag.Tagid }, result);
+            }
+            catch
             {
-                Tagid = tag.Tagid,
-                Status = tag.Status
-            };
-
-            return CreatedAtAction(nameof(GetTag), new { id = tag.Tagid }, result);
+                return StatusCode(500);
+            }
         }
 
         // PUT: api/tags/5
         [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> PutTag(int id, TagsCreateDto dto)
         {
-            var tag = await _context.Tags.FindAsync(id);
-            if (tag == null)
-                return NotFound();
+            if (string.IsNullOrWhiteSpace(dto.Status))
+                return BadRequest("Status is required");
 
-            tag.Status = dto.Status;
+            try
+            {
+                var tag = await _context.Tags.FindAsync(id);
+                if (tag == null)
+                    return NotFound();
 
-            await _context.SaveChangesAsync();
+                tag.Status = dto.Status;
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500);
+            }
         }
 
         // DELETE: api/tags/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> DeleteTag(int id)
         {
-            var tag = await _context.Tags.FindAsync(id);
-            if (tag == null)
-                return NotFound();
+            try
+            {
+                var tag = await _context.Tags.FindAsync(id);
+                if (tag == null)
+                    return NotFound();
 
-            _context.Tags.Remove(tag);
-            await _context.SaveChangesAsync();
+                _context.Tags.Remove(tag);
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
     }
 }

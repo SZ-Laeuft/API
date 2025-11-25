@@ -4,7 +4,6 @@ using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
-
 namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
@@ -20,84 +19,142 @@ namespace SZL_Backend.Controllers
 
         // GET: api/teams
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TeamsDto>>> GetTeams()
+        [ProducesResponseType(typeof(IEnumerable<TeamsDto>), 200)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetTeams()
         {
-            return await _context.Teams
-                .Select(t => new TeamsDto
-                {
-                    Teamid = t.Teamid,
-                    Name = t.Name
-                })
-                .ToListAsync();
+            try
+            {
+                var data = await _context.Teams
+                    .Select(t => new TeamsDto
+                    {
+                        Teamid = t.Teamid,
+                        Name = t.Name
+                    })
+                    .OrderBy(t => t.Teamid)
+                    .ToListAsync();
+
+                return Ok(data);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // GET: api/teams/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TeamsDto>> GetTeam(int id)
+        [ProducesResponseType(typeof(TeamsDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetTeam(int id)
         {
-            var team = await _context.Teams
-                .Where(t => t.Teamid == id)
-                .Select(t => new TeamsDto
-                {
-                    Teamid = t.Teamid,
-                    Name = t.Name
-                })
-                .FirstOrDefaultAsync();
+            try
+            {
+                var team = await _context.Teams
+                    .Where(t => t.Teamid == id)
+                    .Select(t => new TeamsDto
+                    {
+                        Teamid = t.Teamid,
+                        Name = t.Name
+                    })
+                    .FirstOrDefaultAsync();
 
-            if (team == null)
-                return NotFound();
+                if (team == null)
+                    return NotFound();
 
-            return team;
+                return Ok(team);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
 
         // POST: api/teams
         [HttpPost]
-        public async Task<ActionResult<TeamsDto>> PostTeam(TeamsCreateDto dto)
+        [ProducesResponseType(typeof(TeamsDto), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> PostTeam(TeamsCreateDto dto)
         {
-            var team = new Team
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                return BadRequest("Name is required");
+
+            try
             {
-                Name = dto.Name
-            };
+                var team = new Team
+                {
+                    Name = dto.Name
+                };
 
-            _context.Teams.Add(team);
-            await _context.SaveChangesAsync();
+                _context.Teams.Add(team);
+                await _context.SaveChangesAsync();
 
-            var result = new TeamsDto
+                var result = new TeamsDto
+                {
+                    Teamid = team.Teamid,
+                    Name = team.Name
+                };
+
+                return CreatedAtAction(nameof(GetTeam), new { id = team.Teamid }, result);
+            }
+            catch
             {
-                Teamid = team.Teamid,
-                Name = team.Name
-            };
-
-            return CreatedAtAction(nameof(GetTeam), new { id = team.Teamid }, result);
+                return StatusCode(500);
+            }
         }
 
         // PUT: api/teams/5
         [HttpPut("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> PutTeam(int id, TeamsCreateDto dto)
         {
-            var team = await _context.Teams.FindAsync(id);
-            if (team == null)
-                return NotFound();
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                return BadRequest("Name is required");
 
-            team.Name = dto.Name;
+            try
+            {
+                var team = await _context.Teams.FindAsync(id);
+                if (team == null)
+                    return NotFound();
 
-            await _context.SaveChangesAsync();
+                team.Name = dto.Name;
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500);
+            }
         }
 
         // DELETE: api/teams/5
         [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> DeleteTeam(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
-            if (team == null)
-                return NotFound();
+            try
+            {
+                var team = await _context.Teams.FindAsync(id);
+                if (team == null)
+                    return NotFound();
 
-            _context.Teams.Remove(team);
-            await _context.SaveChangesAsync();
+                _context.Teams.Remove(team);
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
         }
     }
 }
