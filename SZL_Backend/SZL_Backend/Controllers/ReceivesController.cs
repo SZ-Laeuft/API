@@ -22,10 +22,10 @@ namespace SZL_Backend.Controllers
         [HttpGet("{giftId}/{participateId}")]
         public ActionResult<ReceivesDTO> Get(int giftId, int participateId)
         {
-            var recieve = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
-            if (recieve == null)
+            var receive = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
+            if (receive == null)
                 return NotFound();
-            return Ok(recieve);
+            return Ok(receive);
         }
 
         // POST: api/receives
@@ -43,12 +43,12 @@ namespace SZL_Backend.Controllers
         [HttpPut("{giftId}/{participateId}")]
         public IActionResult Update(int giftId, int participateId, [FromBody] ReceivesDTO dto)
         {
-            var recieve = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
-            if (recieve == null)
+            var receive = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
+            if (receive == null)
                 return NotFound();
             
-            recieve.Giftid = dto.Giftid;
-            recieve.Participateid = dto.Participateid;
+            receive.Giftid = dto.Giftid;
+            receive.Participateid = dto.Participateid;
 
             return NoContent();
         }
@@ -57,11 +57,11 @@ namespace SZL_Backend.Controllers
         [HttpDelete("{giftId}/{participateId}")]
         public IActionResult Delete(int giftId, int participateId)
         {
-            var recieve = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
-            if (recieve == null)
+            var receive = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
+            if (receive == null)
                 return NotFound();
 
-            _receives.Remove(recieve);
+            _receives.Remove(receive);
             return NoContent();
         }
     }
