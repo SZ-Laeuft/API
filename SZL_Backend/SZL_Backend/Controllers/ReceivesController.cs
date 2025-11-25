@@ -1,42 +1,47 @@
 using Microsoft.AspNetCore.Mvc;
 using SZL_Backend.Dto;
-using System.Collections.Generic;
-using System.Linq;
+
 
 namespace SZL_Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ReceivesController : ControllerBase
+    public class ReceivesController : ApiControllerBase
     {
         private static List<ReceivesDto> _receives = new List<ReceivesDto>();
 
         // GET: api/receives
         [HttpGet]
-        public ActionResult<IEnumerable<ReceivesDto>> GetAll()
+        public IActionResult GetAll()
         {
-            return Ok(_receives);
+            return Success(_receives);
         }
 
         // GET: api/receives/{giftId}/{participateId}
         [HttpGet("{giftId}/{participateId}")]
-        public ActionResult<ReceivesDto> Get(int giftId, int participateId)
+        public IActionResult Get(int giftId, int participateId)
         {
             var receive = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
             if (receive == null)
-                return NotFound();
-            return Ok(receive);
+                return Error<ReceivesDto>("Record not found", 404);
+
+            return Success(receive);
         }
 
         // POST: api/receives
         [HttpPost]
-        public ActionResult<ReceivesDto> Create([FromBody] ReceivesDto dto)
+        public IActionResult Create([FromBody] ReceivesDto dto)
         {
             if (_receives.Any(r => r.Giftid == dto.Giftid && r.Participateid == dto.Participateid))
-                return Conflict("This record already exists.");
+                return Error<ReceivesDto>("This record already exists", 409);
 
             _receives.Add(dto);
-            return CreatedAtAction(nameof(Get), new { giftId = dto.Giftid, participateId = dto.Participateid }, dto);
+
+            return CreatedAtAction(
+                nameof(Get),
+                new { giftId = dto.Giftid, participateId = dto.Participateid },
+                new ApiResponse<ReceivesDto> { Success = true, Data = dto }
+            );
         }
 
         // PUT: api/receives/{giftId}/{participateId}
@@ -45,8 +50,8 @@ namespace SZL_Backend.Controllers
         {
             var receive = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
             if (receive == null)
-                return NotFound();
-            
+                return Error<object>("Record not found", 404);
+
             receive.Giftid = dto.Giftid;
             receive.Participateid = dto.Participateid;
 
@@ -59,9 +64,10 @@ namespace SZL_Backend.Controllers
         {
             var receive = _receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
             if (receive == null)
-                return NotFound();
+                return Error<object>("Record not found", 404);
 
             _receives.Remove(receive);
+
             return NoContent();
         }
     }

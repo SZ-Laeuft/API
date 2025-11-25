@@ -4,12 +4,11 @@ using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
-
 namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RoundsController : ControllerBase
+    public class RoundsController : ApiControllerBase
     {
         private readonly SZLDbContext _context;
 
@@ -20,9 +19,9 @@ namespace SZL_Backend.Controllers
 
         // GET: api/rounds
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RoundsDto>>> GetRounds()
+        public async Task<IActionResult> GetRounds()
         {
-            return await _context.Rounds
+            var rounds = await _context.Rounds
                 .Select(r => new RoundsDto
                 {
                     Roundid = r.Roundid,
@@ -30,11 +29,13 @@ namespace SZL_Backend.Controllers
                     Roundtimestamp = r.Roundtimestamp
                 })
                 .ToListAsync();
+
+            return Success(rounds);
         }
 
         // GET: api/rounds/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<RoundsDto>> GetRound(int id)
+        public async Task<IActionResult> GetRound(int id)
         {
             var round = await _context.Rounds
                 .Where(r => r.Roundid == id)
@@ -47,15 +48,18 @@ namespace SZL_Backend.Controllers
                 .FirstOrDefaultAsync();
 
             if (round == null)
-                return NotFound();
+                return Error<RoundsDto>("Round not found", 404);
 
-            return round;
+            return Success(round);
         }
 
         // POST: api/rounds
         [HttpPost]
-        public async Task<ActionResult<RoundsDto>> PostRound(RoundsCreateDto dto)
+        public async Task<IActionResult> PostRound(RoundsCreateDto dto)
         {
+            if (!ModelState.IsValid)
+                return Error<RoundsDto>("Invalid round data", 422);
+
             var round = new Round
             {
                 Participateid = dto.Participateid,
@@ -72,23 +76,30 @@ namespace SZL_Backend.Controllers
                 Roundtimestamp = round.Roundtimestamp
             };
 
-            return CreatedAtAction(nameof(GetRound), new { id = round.Roundid }, result);
+            return CreatedAtAction(
+                nameof(GetRound),
+                new { id = round.Roundid },
+                new ApiResponse<RoundsDto> { Success = true, Data = result }
+            );
         }
 
         // PUT: api/rounds/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRound(int id, RoundsCreateDto dto)
         {
+            if (!ModelState.IsValid)
+                return Error<object>("Invalid round data", 422);
+
             var round = await _context.Rounds.FindAsync(id);
             if (round == null)
-                return NotFound();
+                return Error<object>("Round not found", 404);
 
             round.Participateid = dto.Participateid;
             round.Roundtimestamp = dto.Roundtimestamp;
 
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return NoContent(); 
         }
 
         // DELETE: api/rounds/5
@@ -97,12 +108,12 @@ namespace SZL_Backend.Controllers
         {
             var round = await _context.Rounds.FindAsync(id);
             if (round == null)
-                return NotFound();
+                return Error<object>("Round not found", 404);
 
             _context.Rounds.Remove(round);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return NoContent(); 
         }
     }
 }

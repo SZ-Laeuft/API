@@ -9,7 +9,7 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TeamsController : ControllerBase
+    public class TeamsController : ApiControllerBase
     {
         private readonly SZLDbContext _context;
 
@@ -20,20 +20,22 @@ namespace SZL_Backend.Controllers
 
         // GET: api/teams
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TeamsDto>>> GetTeams()
+        public async Task<IActionResult> GetTeams()
         {
-            return await _context.Teams
+            var teams = await _context.Teams
                 .Select(t => new TeamsDto
                 {
                     Teamid = t.Teamid,
                     Name = t.Name
                 })
                 .ToListAsync();
+
+            return Success(teams);
         }
 
         // GET: api/teams/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TeamsDto>> GetTeam(int id)
+        public async Task<IActionResult> GetTeam(int id)
         {
             var team = await _context.Teams
                 .Where(t => t.Teamid == id)
@@ -45,15 +47,18 @@ namespace SZL_Backend.Controllers
                 .FirstOrDefaultAsync();
 
             if (team == null)
-                return NotFound();
+                return Error<TeamsDto>("Team not found", 404);
 
-            return team;
+            return Success(team);
         }
 
         // POST: api/teams
         [HttpPost]
-        public async Task<ActionResult<TeamsDto>> PostTeam(TeamsCreateDto dto)
+        public async Task<IActionResult> PostTeam(TeamsCreateDto dto)
         {
+            if (!ModelState.IsValid)
+                return Error<TeamsDto>("Invalid team data", 422);
+
             var team = new Team
             {
                 Name = dto.Name
@@ -68,16 +73,23 @@ namespace SZL_Backend.Controllers
                 Name = team.Name
             };
 
-            return CreatedAtAction(nameof(GetTeam), new { id = team.Teamid }, result);
+            return CreatedAtAction(
+                nameof(GetTeam),
+                new { id = team.Teamid },
+                new ApiResponse<TeamsDto> { Success = true, Data = result }
+            );
         }
 
         // PUT: api/teams/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTeam(int id, TeamsCreateDto dto)
         {
+            if (!ModelState.IsValid)
+                return Error<object>("Invalid team data", 422);
+
             var team = await _context.Teams.FindAsync(id);
             if (team == null)
-                return NotFound();
+                return Error<object>("Team not found", 404);
 
             team.Name = dto.Name;
 
@@ -92,7 +104,7 @@ namespace SZL_Backend.Controllers
         {
             var team = await _context.Teams.FindAsync(id);
             if (team == null)
-                return NotFound();
+                return Error<object>("Team not found", 404);
 
             _context.Teams.Remove(team);
             await _context.SaveChangesAsync();

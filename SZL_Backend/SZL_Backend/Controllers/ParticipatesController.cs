@@ -4,12 +4,11 @@ using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
 
-
 namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ParticipatesController : ControllerBase
+    public class ParticipatesController : ApiControllerBase
     {
         private readonly SZLDbContext _context;
 
@@ -17,12 +16,12 @@ namespace SZL_Backend.Controllers
         {
             _context = context;
         }
-
+        
         // GET: api/participates
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ParticipatesDto>>> GetParticipates()
+        public async Task<IActionResult> GetParticipates()
         {
-            return await _context.Participates
+            var participates = await _context.Participates
                 .Select(p => new ParticipatesDto
                 {
                     Participateid = p.Participateid,
@@ -32,11 +31,13 @@ namespace SZL_Backend.Controllers
                     Eventid = p.Eventid
                 })
                 .ToListAsync();
+
+            return Success(participates);
         }
 
         // GET: api/participates/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ParticipatesDto>> GetParticipate(int id)
+        public async Task<IActionResult> GetParticipate(int id)
         {
             var participate = await _context.Participates
                 .Where(p => p.Participateid == id)
@@ -51,15 +52,23 @@ namespace SZL_Backend.Controllers
                 .FirstOrDefaultAsync();
 
             if (participate == null)
-                return NotFound();
+                return Error<ParticipatesDto>("Participate not found", 404);
 
-            return participate;
+            return Success(participate);
         }
 
         // POST: api/participates
         [HttpPost]
-        public async Task<ActionResult<ParticipatesDto>> PostParticipate(ParticipatesCreateDto dto)
+        public async Task<IActionResult> PostParticipate(ParticipatesCreateDto dto)
         {
+            if (!ModelState.IsValid)
+                return 
+                    Error<ParticipatesDto>("Invalid participate data", 422);
+
+            // Optional: check for duplicate participate for same runner in same event
+            if (await _context.Participates.AnyAsync(p => p.Runnerid == dto.Runnerid && p.Eventid == dto.Eventid))
+                return Error<ParticipatesDto>("This runner is already registered for the event", 409);
+
             var participate = new Participate
             {
                 Teamid = dto.Teamid,
@@ -80,16 +89,23 @@ namespace SZL_Backend.Controllers
                 Eventid = participate.Eventid
             };
 
-            return CreatedAtAction(nameof(GetParticipate), new { id = participate.Participateid }, result);
+            return CreatedAtAction(
+                nameof(GetParticipate),
+                new { id = participate.Participateid },
+                new ApiResponse<ParticipatesDto> { Success = true, Data = result }
+            );
         }
 
         // PUT: api/participates/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutParticipate(int id, ParticipatesCreateDto dto)
         {
+            if (!ModelState.IsValid)
+                return Error<object>("Invalid participate data", 422);
+
             var participate = await _context.Participates.FindAsync(id);
             if (participate == null)
-                return NotFound();
+                return Error<object>("Participate not found", 404);
 
             participate.Teamid = dto.Teamid;
             participate.Tagid = dto.Tagid;
@@ -98,7 +114,7 @@ namespace SZL_Backend.Controllers
 
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return NoContent(); 
         }
 
         // DELETE: api/participates/5
@@ -107,7 +123,7 @@ namespace SZL_Backend.Controllers
         {
             var participate = await _context.Participates.FindAsync(id);
             if (participate == null)
-                return NotFound();
+                return Error<object>("Participate not found", 404);
 
             _context.Participates.Remove(participate);
             await _context.SaveChangesAsync();
