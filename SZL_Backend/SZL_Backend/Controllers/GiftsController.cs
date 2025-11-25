@@ -8,7 +8,7 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GiftsController : ApiControllerBase
+    public class GiftsController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
@@ -16,12 +16,12 @@ namespace SZL_Backend.Controllers
         {
             _context = context;
         }
-        
+
         // GET: api/gifts
         [HttpGet]
-        public async Task<IActionResult> GetGifts()
+        public async Task<ActionResult<IEnumerable<GiftsDto>>> GetGifts()
         {
-            var gifts = await _context.Gifts
+            return await _context.Gifts
                 .Select(g => new GiftsDto
                 {
                     Giftid = g.Giftid,
@@ -29,13 +29,11 @@ namespace SZL_Backend.Controllers
                     Requirement = g.Requirement
                 })
                 .ToListAsync();
-
-            return Success<IEnumerable<GiftsDto>>(gifts);
         }
 
         // GET: api/gifts/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetGift(int id)
+        public async Task<ActionResult<GiftsDto>> GetGift(int id)
         {
             var gift = await _context.Gifts
                 .Where(g => g.Giftid == id)
@@ -48,22 +46,15 @@ namespace SZL_Backend.Controllers
                 .FirstOrDefaultAsync();
 
             if (gift == null)
-                return Error<GiftsDto>("Gift not found", 404);
+                return NotFound();
 
-            return Success(gift);
+            return gift;
         }
 
         // POST: api/gifts
         [HttpPost]
-        public async Task<IActionResult> PostGift(GiftsCreateDto dto)
+        public async Task<ActionResult<GiftsDto>> PostGift(GiftsCreateDto dto)
         {
-            if (!ModelState.IsValid)
-                return Error<GiftsDto>("Invalid gift data", 422);
-
-            // Optional: check for duplicate gift name
-            if (await _context.Gifts.AnyAsync(g => g.Name == dto.Name))
-                return Error<GiftsDto>("Gift with the same name already exists", 409);
-
             var gift = new Gift
             {
                 Name = dto.Name,
@@ -80,30 +71,23 @@ namespace SZL_Backend.Controllers
                 Requirement = gift.Requirement
             };
 
-            return CreatedAtAction(
-                nameof(GetGift),
-                new { id = gift.Giftid },
-                new ApiResponse<GiftsDto> { Success = true, Data = result }
-            );
+            return CreatedAtAction(nameof(GetGift), new { id = gift.Giftid }, result);
         }
 
         // PUT: api/gifts/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutGift(int id, GiftsCreateDto dto)
         {
-            if (!ModelState.IsValid)
-                return Error<object>("Invalid gift data", 422);
-
             var gift = await _context.Gifts.FindAsync(id);
             if (gift == null)
-                return Error<object>("Gift not found", 404);
+                return NotFound();
 
             gift.Name = dto.Name;
             gift.Requirement = dto.Requirement;
 
             await _context.SaveChangesAsync();
 
-            return NoContent(); // 204
+            return NoContent();
         }
 
         // DELETE: api/gifts/5
@@ -112,12 +96,12 @@ namespace SZL_Backend.Controllers
         {
             var gift = await _context.Gifts.FindAsync(id);
             if (gift == null)
-                return Error<object>("Gift not found", 404);
+                return NotFound();
 
             _context.Gifts.Remove(gift);
             await _context.SaveChangesAsync();
 
-            return NoContent(); // 204
+            return NoContent();
         }
     }
 }

@@ -23,10 +23,7 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "API documentation for SZL Backend"
     });
-
-    c.EnableAnnotations();
 });
-
 
 builder.Services.AddDbContext<SZLDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

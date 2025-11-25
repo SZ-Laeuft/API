@@ -8,7 +8,7 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EventsController : ApiControllerBase
+    public class EventsController : ControllerBase
     {
         private readonly SZLDbContext _context;
 
@@ -16,12 +16,12 @@ namespace SZL_Backend.Controllers
         {
             _context = context;
         }
-        
+
         // GET: api/events
         [HttpGet]
-        public async Task<IActionResult> GetEvents()
+        public async Task<ActionResult<IEnumerable<EventsDto>>> GetEvents()
         {
-            var events = await _context.Events
+            return await _context.Events
                 .Select(e => new EventsDto
                 {
                     Eventid = e.Eventid,
@@ -33,13 +33,11 @@ namespace SZL_Backend.Controllers
                     Categoryid = e.Categoryid
                 })
                 .ToListAsync();
-
-            return Success<IEnumerable<EventsDto>>(events);
         }
 
         // GET: api/events/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetEvent(int id)
+        public async Task<ActionResult<EventsDto>> GetEvent(int id)
         {
             var evt = await _context.Events
                 .Where(e => e.Eventid == id)
@@ -56,22 +54,15 @@ namespace SZL_Backend.Controllers
                 .FirstOrDefaultAsync();
 
             if (evt == null)
-                return Error<EventsDto>("Event not found", 404);
+                return NotFound();
 
-            return Success(evt);
+            return evt;
         }
 
         // POST: api/events
         [HttpPost]
-        public async Task<IActionResult> PostEvent(EventsCreateDto dto)
+        public async Task<ActionResult<EventsDto>> PostEvent(EventsCreateDto dto)
         {
-            if (!ModelState.IsValid)
-                return Error<EventsDto>("Invalid event data", 422);
-
-            // Optional: check if event with same name already exists
-            if (await _context.Events.AnyAsync(e => e.Name == dto.Name))
-                return Error<EventsDto>("Event with the same name already exists", 409);
-
             var evt = new Event
             {
                 Name = dto.Name,
@@ -96,23 +87,16 @@ namespace SZL_Backend.Controllers
                 Categoryid = evt.Categoryid
             };
 
-            return CreatedAtAction(
-                nameof(GetEvent),
-                new { id = evt.Eventid },
-                new ApiResponse<EventsDto> { Success = true, Data = result }
-            );
+            return CreatedAtAction(nameof(GetEvent), new { id = evt.Eventid }, result);
         }
 
         // PUT: api/events/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEvent(int id, EventsCreateDto dto)
         {
-            if (!ModelState.IsValid)
-                return Error<object>("Invalid event data", 422);
-
             var evt = await _context.Events.FindAsync(id);
             if (evt == null)
-                return Error<object>("Event not found", 404);
+                return NotFound();
 
             evt.Name = dto.Name;
             evt.Place = dto.Place;
@@ -123,7 +107,7 @@ namespace SZL_Backend.Controllers
 
             await _context.SaveChangesAsync();
 
-            return NoContent(); 
+            return NoContent();
         }
 
         // DELETE: api/events/5
@@ -132,7 +116,7 @@ namespace SZL_Backend.Controllers
         {
             var evt = await _context.Events.FindAsync(id);
             if (evt == null)
-                return Error<object>("Event not found", 404);
+                return NotFound();
 
             _context.Events.Remove(evt);
             await _context.SaveChangesAsync();
@@ -140,5 +124,4 @@ namespace SZL_Backend.Controllers
             return NoContent();
         }
     }
- 
 }
