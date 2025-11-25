@@ -1,7 +1,7 @@
 ﻿services:
   szl_backend:
     container_name: szl_backend
-    image: szl_backend:latest
+    image: szl_backend
     build:
       context: .
       dockerfile: SZL_Backend/Dockerfile
