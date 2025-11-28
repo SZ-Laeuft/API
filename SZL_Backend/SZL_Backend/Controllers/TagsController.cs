@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
@@ -12,6 +13,10 @@ namespace SZL_Backend.Controllers
     {
         // GET: api/tags
         [HttpGet]
+        [SwaggerOperation (
+            Summary = "Get all tags" , 
+            Description = "Gets a list of all tags available"
+            )]
         [ProducesResponseType(typeof(IEnumerable<TagsDto>), 200)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetTags()
@@ -37,6 +42,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/tags/5
         [HttpGet("{id}")]
+        [SwaggerOperation (
+            Summary = "Get tag by ID", 
+            Description = "Gets a specific tag by its unique ID."
+            )]
         [ProducesResponseType(typeof(TagsDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -66,6 +75,10 @@ namespace SZL_Backend.Controllers
 
         // POST: api/tags
         [HttpPost]
+        [SwaggerOperation (
+            Summary = "Create a new tag", 
+            Description = "Creates a new tag with the provided information."
+            )]
         [ProducesResponseType(typeof(TagsDto), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -100,6 +113,10 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/tags/5
         [HttpPut("{id}")]
+        [SwaggerOperation (
+            Summary = "Update an existing tag", 
+            Description = "Updates the details of an existing tag identified by its ID."
+            )]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -128,6 +145,10 @@ namespace SZL_Backend.Controllers
 
         // DELETE: api/tags/5
         [HttpDelete("{id}")]
+        [SwaggerOperation (
+            Summary = "Delete a tag", 
+            Description = "Deletes an existing tag identified by its ID."
+            )]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]

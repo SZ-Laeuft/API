@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
@@ -12,6 +13,10 @@ namespace SZL_Backend.Controllers
     {
         // GET: api/gifts
         [HttpGet]
+        [SwaggerOperation (
+            Summary = "Gets all gifts" , 
+            Description = "Gets a list of all gifts available"
+            )]
         [ProducesResponseType(typeof(IEnumerable<GiftsDto>), 200)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetGifts()
@@ -38,6 +43,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/gifts/5
         [HttpGet("{id}")]
+        [SwaggerOperation (
+            Summary = "Get gift by ID", 
+            Description = "Gets a specific gift by its unique ID."
+            )]
         [ProducesResponseType(typeof(GiftsDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -68,6 +77,10 @@ namespace SZL_Backend.Controllers
 
         // POST: api/gifts
         [HttpPost]
+        [SwaggerOperation (
+            Summary = "Create a new gift", 
+            Description = "Creates a new gift with the provided details."
+            )]
         [ProducesResponseType(typeof(GiftsDto), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -104,6 +117,10 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/gifts/5
         [HttpPut("{id}")]
+        [SwaggerOperation (
+            Summary = "Update an existing gift", 
+            Description = "Updates the details of an existing gift identified by its ID."
+            )]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -134,6 +151,10 @@ namespace SZL_Backend.Controllers
 
         // DELETE: api/gifts/5
         [HttpDelete("{id}")]
+        [SwaggerOperation (
+            Summary = "Delete a gift", 
+            Description = "Deletes an existing gift identified by its ID."
+            )]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]

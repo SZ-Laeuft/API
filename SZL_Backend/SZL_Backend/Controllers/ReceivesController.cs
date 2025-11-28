@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using SZL_Backend.Dto;
 
 
@@ -12,6 +13,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/receives
         [HttpGet]
+        [SwaggerOperation (
+            Summary = "Get all receives",
+            Description = "Gets a list of all receives records"
+            )]
         [ProducesResponseType(typeof(IEnumerable<ReceivesDto>), 200)]
         [ProducesResponseType(500)]
         public IActionResult GetAll()
@@ -28,6 +33,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/receives/{giftId}/{participateId}
         [HttpGet("{giftId}/{participateId}")]
+        [SwaggerOperation (
+            Summary = "Get receive by GiftId and ParticipateId",
+            Description = "Gets a specific receive record by its GiftId and ParticipateId."
+            )]
         [ProducesResponseType(typeof(ReceivesDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -49,6 +58,10 @@ namespace SZL_Backend.Controllers
 
         // POST: api/receives
         [HttpPost]
+        [SwaggerOperation (
+            Summary = "Create a new receive record",
+            Description = "Creates a new receive record with the provided GiftId and ParticipateId."
+            )]
         [ProducesResponseType(typeof(ReceivesDto), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(409)]
@@ -74,6 +87,10 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/receives/{giftId}/{participateId}
         [HttpPut("{giftId}/{participateId}")]
+        [SwaggerOperation (
+            Summary = "Update a receive record",
+            Description = "Updates an existing receive record identified by GiftId and ParticipateId."
+            )]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -102,6 +119,10 @@ namespace SZL_Backend.Controllers
 
         // DELETE: api/receives/{giftId}/{participateId}
         [HttpDelete("{giftId}/{participateId}")]
+        [SwaggerOperation (
+            Summary = "Delete a receive record",
+            Description = "Deletes an existing receive record identified by GiftId and ParticipateId."
+            )]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]

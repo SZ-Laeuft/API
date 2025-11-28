@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
@@ -12,6 +13,10 @@ namespace SZL_Backend.Controllers
     {
         // GET: api/teams
         [HttpGet]
+        [SwaggerOperation (
+            Summary = "Gets all teams" , 
+            Description = "Gets a list of all teams available"
+            )]
         [ProducesResponseType(typeof(IEnumerable<TeamsDto>), 200)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetTeams()
@@ -37,6 +42,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/teams/5
         [HttpGet("{id}")]
+        [SwaggerOperation (
+            Summary = "Get team by ID", 
+            Description = "Gets a specific team by its unique ID."
+            )]
         [ProducesResponseType(typeof(TeamsDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -66,6 +75,10 @@ namespace SZL_Backend.Controllers
 
         // POST: api/teams
         [HttpPost]
+        [SwaggerOperation (
+            Summary = "Create a new team",
+            Description = "Creates a new team with the provided information."
+        )]
         [ProducesResponseType(typeof(TeamsDto), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -100,6 +113,10 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/teams/5
         [HttpPut("{id}")]
+        [SwaggerOperation (
+            Summary = "Update an existing team", 
+            Description = "Updates the details of an existing team identified by its ID."
+            )]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -128,6 +145,10 @@ namespace SZL_Backend.Controllers
 
         // DELETE: api/teams/5
         [HttpDelete("{id}")]
+        [SwaggerOperation (
+            Summary = "Delete a team",
+            Description = "Deletes an existing team identified by its ID."
+        )]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]

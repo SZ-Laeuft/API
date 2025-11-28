@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
@@ -12,6 +13,10 @@ namespace SZL_Backend.Controllers
     {
         // GET: api/participates
         [HttpGet]
+        [SwaggerOperation (
+            Summary = "Get all participates",
+            Description = "Retrieves a list of all participates in events."
+        )]
         [ProducesResponseType(typeof(IEnumerable<ParticipatesDto>), 200)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetParticipates()
@@ -40,6 +45,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/participates/5
         [HttpGet("{id}")]
+        [SwaggerOperation (
+            Summary = "Get participate by ID",
+            Description = "Retrieves a specific participate by its unique ID."
+        )]
         [ProducesResponseType(typeof(ParticipatesDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -72,6 +81,10 @@ namespace SZL_Backend.Controllers
 
         // POST: api/participates
         [HttpPost]
+        [SwaggerOperation (
+            Summary = "Create a new participate",
+            Description = "Creates a new participate entry for a team in an event."
+        )]
         [ProducesResponseType(typeof(ParticipatesDto), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -112,6 +125,10 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/participates/5
         [HttpPut("{id}")]
+        [SwaggerOperation (
+            Summary = "Update an existing participate",
+            Description = "Updates the details of an existing participate entry."
+        )]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -144,6 +161,10 @@ namespace SZL_Backend.Controllers
 
         // DELETE: api/participates/5
         [HttpDelete("{id}")]
+        [SwaggerOperation (
+            Summary = "Delete a participate",
+            Description = "Deletes an existing participate entry identified by its ID."
+        )]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
@@ -10,9 +11,15 @@ namespace SZL_Backend.Controllers
     [ApiController]
     public class CategoriesController(SZLDbContext context) : ControllerBase
     {
+        // GET: api/categories
         [HttpGet]
+        [SwaggerOperation(
+            Summary = "Get all categories",
+            Description = "Retrieves a list of all categories available in the system."
+        )]
         [ProducesResponseType(typeof(IEnumerable<CategoriesDto>), 200)] 
         [ProducesResponseType(500)] 
+        
         public async Task<IActionResult> GetCategories()
         {
             try
@@ -34,8 +41,12 @@ namespace SZL_Backend.Controllers
             }
         }
 
-       
+        // GET: api/gifts/5
         [HttpGet("{id}")]
+        [SwaggerOperation(
+            Summary = "Get category by ID",
+            Description = "Retrieves a specific category by its unique ID."
+        )]
         [ProducesResponseType(typeof(CategoriesDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)] 
@@ -62,7 +73,12 @@ namespace SZL_Backend.Controllers
             }
         }
         
+        // Post: api/categories
         [HttpPost]
+        [SwaggerOperation(
+            Summary = "Create a new category",
+            Description = "Creates a new category with the provided details."
+        )]
         [ProducesResponseType(typeof(CategoriesDto), 201)] 
         [ProducesResponseType(400)]
         [ProducesResponseType(409)] 
@@ -96,7 +112,12 @@ namespace SZL_Backend.Controllers
             }
         }
         
+        // PUT: api/categories/5
         [HttpPut("{id}")]
+        [SwaggerOperation(
+            Summary = "Update an existing category",
+            Description = "Updates the details of an existing category identified by its ID."
+        )]
         [ProducesResponseType(204)] 
         [ProducesResponseType(400)] 
         [ProducesResponseType(404)]
@@ -123,7 +144,12 @@ namespace SZL_Backend.Controllers
             }
         }
         
+        // DELETE: api/categories/5
         [HttpDelete("{id}")]
+        [SwaggerOperation(
+            Summary = "Delete a category",
+            Description = "Deletes an existing category identified by its ID."
+        )]
         [ProducesResponseType(204)] 
         [ProducesResponseType(404)] 
         [ProducesResponseType(500)]

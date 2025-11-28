@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
@@ -12,6 +13,10 @@ namespace SZL_Backend.Controllers
     {
         // GET: api/donations
         [HttpGet]
+        [SwaggerOperation(
+            Summary = "Get all donations",
+            Description = "Retrieves a list of all donations made."
+        )]
         [ProducesResponseType(typeof(IEnumerable<DonationsDto>), 200)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetDonations()
@@ -38,6 +43,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/donations/5
         [HttpGet("{id}")]
+        [SwaggerOperation(
+            Summary = "Get donation by ID",
+            Description = "Retrieves a specific donation by its unique ID."
+        )]
         [ProducesResponseType(typeof(DonationsDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -68,6 +77,10 @@ namespace SZL_Backend.Controllers
 
         // POST: api/donations
         [HttpPost]
+        [SwaggerOperation(
+            Summary = "Create a new donation",
+            Description = "Creates a new donation record with the provided details."
+        )]
         [ProducesResponseType(typeof(DonationsDto), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(409)]
@@ -105,6 +118,10 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/donations/5
         [HttpPut("{id}")]
+        [SwaggerOperation(
+            Summary = "Update an existing donation",
+            Description = "Updates the details of an existing donation identified by its ID."
+        )]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -135,6 +152,10 @@ namespace SZL_Backend.Controllers
 
         // DELETE: api/donations/5
         [HttpDelete("{id}")]
+        [SwaggerOperation(
+            Summary = "Delete a donation",
+            Description = "Deletes an existing donation identified by its ID."
+        )]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]

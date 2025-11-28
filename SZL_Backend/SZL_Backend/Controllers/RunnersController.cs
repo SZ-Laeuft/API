@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
@@ -12,6 +13,10 @@ namespace SZL_Backend.Controllers
     {
         // GET: api/runners
         [HttpGet]
+        [SwaggerOperation (
+            Summary = "Get all runners" , 
+            Description = "Retrieves a list of all runners registered."
+            )]
         [ProducesResponseType(typeof(IEnumerable<RunnersDto>), 200)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetRunners()
@@ -38,6 +43,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/runners/5
         [HttpGet("{id}")]
+        [SwaggerOperation (
+            Summary = "Get runner by ID" ,
+            Description = "Retrieves a specific runner by its unique ID."
+            )]
         [ProducesResponseType(typeof(RunnersDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -68,6 +77,10 @@ namespace SZL_Backend.Controllers
 
         // POST: api/runners
         [HttpPost]
+        [SwaggerOperation (
+            Summary = "Create a new runner" ,
+            Description = "Creates a new runner with the provided details."
+            )]
         [ProducesResponseType(typeof(RunnersDto), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -104,6 +117,10 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/runners/5
         [HttpPut("{id}")]
+        [SwaggerOperation (
+            Summary = "Update an existing runner" ,
+            Description = "Updates the details of an existing runner identified by its ID."
+            )]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -134,6 +151,10 @@ namespace SZL_Backend.Controllers
 
         // DELETE: api/runners/5
         [HttpDelete("{id}")]
+        [SwaggerOperation (
+            Summary = "Delete a runner" ,
+            Description = "Deletes an existing runner identified by its ID."
+            )]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]

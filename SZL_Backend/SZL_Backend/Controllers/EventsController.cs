@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using SZL_Backend.Context;
 using SZL_Backend.Dto;
 using SZL_Backend.Entities;
@@ -12,6 +13,10 @@ namespace SZL_Backend.Controllers
     {
         // GET: api/events
         [HttpGet]
+        [SwaggerOperation(
+            Summary =  "Get all events", 
+            Description = "Gets all events"
+            )]
         [ProducesResponseType(typeof(IEnumerable<EventsDto>), 200)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetEvents()
@@ -42,6 +47,10 @@ namespace SZL_Backend.Controllers
 
         // GET: api/events/5
         [HttpGet("{id}")]
+        [SwaggerOperation (
+            Summary = "Get event by ID", 
+            Description = "Gets a specific event by its unique ID."
+            )]
         [ProducesResponseType(typeof(EventsDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -76,6 +85,10 @@ namespace SZL_Backend.Controllers
 
         // POST: api/events
         [HttpPost]
+        [SwaggerOperation (
+            Summary = "Create a new event", 
+            Description = "Creates a new event with the provided details."
+            )]
         [ProducesResponseType(typeof(EventsDto), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -120,6 +133,10 @@ namespace SZL_Backend.Controllers
 
         // PUT: api/events/5
         [HttpPut("{id}")]
+        [SwaggerOperation (
+            Summary = "Update an existing event", 
+            Description = "Updates the details of an existing event identified by its ID."
+            )]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -154,6 +171,10 @@ namespace SZL_Backend.Controllers
 
         // DELETE: api/events/5
         [HttpDelete("{id}")]
+        [SwaggerOperation (
+            Summary = "Delete an event", 
+            Description = "Deletes an existing event identified by its ID."
+            )]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
