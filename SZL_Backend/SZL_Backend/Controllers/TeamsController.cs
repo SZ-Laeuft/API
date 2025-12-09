@@ -26,10 +26,10 @@ namespace SZL_Backend.Controllers
                 var data = await context.Teams
                     .Select(t => new TeamsDto
                     {
-                        Teamid = t.Teamid,
+                        TeamId = t.Teamid,
                         Name = t.Name
                     })
-                    .OrderBy(t => t.Teamid)
+                    .OrderBy(t => t.TeamId)
                     .ToListAsync();
 
                 return Ok(data);
@@ -57,7 +57,7 @@ namespace SZL_Backend.Controllers
                     .Where(t => t.Teamid == id)
                     .Select(t => new TeamsDto
                     {
-                        Teamid = t.Teamid,
+                        TeamId = t.Teamid,
                         Name = t.Name
                     })
                     .FirstOrDefaultAsync();
@@ -99,7 +99,7 @@ namespace SZL_Backend.Controllers
 
                 var result = new TeamsDto
                 {
-                    Teamid = team.Teamid,
+                    TeamId = team.Teamid,
                     Name = team.Name
                 };
 

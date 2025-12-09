@@ -11,6 +11,20 @@ namespace SZL_Backend.Controllers
     {
         private static readonly List<ReceivesDto> Receives = new List<ReceivesDto>();
 
+        // GET: api/receives/{giftId}/{participateId}
+        [HttpGet("{giftId}/{participateId}")] 
+        [SwaggerOperation 
+            ( Summary = "Get receive by GiftId and ParticipateId", 
+                Description = "Gets a specific receive record by its GiftId and ParticipateId." )] 
+        [ProducesResponseType(typeof(ReceivesDto), 200)] 
+        [ProducesResponseType(404)] 
+        [ProducesResponseType(500)] 
+        public IActionResult Get(int giftId, int participateId) 
+        { try { var receive = Receives.FirstOrDefault(r => r.GiftId == giftId && r.ParticipateId == participateId); 
+            if (receive == null) return NotFound();
+            return Ok(receive); }
+            catch { return StatusCode(500); } }
+        
         // GET: api/receives
         [HttpGet]
         [SwaggerOperation (
@@ -31,20 +45,20 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // GET: api/receives/{giftId}/{participateId}
-        [HttpGet("{giftId}/{participateId}")]
-        [SwaggerOperation (
-            Summary = "Get receive by GiftId and ParticipateId",
-            Description = "Gets a specific receive record by its GiftId and ParticipateId."
-            )]
+        // GET: api/receives/gift/{giftId}
+        [HttpGet("gift/{giftId}")]
+        [SwaggerOperation(
+            Summary = "Get receive by GiftId",
+            Description = "Gets receive records identified by GiftId."
+        )]
         [ProducesResponseType(typeof(ReceivesDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public IActionResult Get(int giftId, int participateId)
+        public IActionResult GetByGiftId(int giftId)
         {
             try
             {
-                var receive = Receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
+                var receive = Receives.FirstOrDefault(r => r.GiftId == giftId);
                 if (receive == null)
                     return NotFound();
 
@@ -55,6 +69,33 @@ namespace SZL_Backend.Controllers
                 return StatusCode(500);
             }
         }
+        
+        // GET: api/receives/participate/{participateId}
+        [HttpGet("participate/{participateId}")]
+        [SwaggerOperation(
+            Summary = "Get receive by ParticipateId",
+            Description = "Gets receive records identified by ParticipateId."
+        )]
+        [ProducesResponseType(typeof(ReceivesDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult GetByParticipateId(int participateId)
+        {
+            try
+            {
+                var receive = Receives.FirstOrDefault(r => r.ParticipateId == participateId);
+                if (receive == null)
+                    return NotFound();
+
+                return Ok(receive);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+
+
 
         // POST: api/receives
         [HttpPost]
@@ -68,16 +109,16 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(500)]
         public IActionResult Create([FromBody] ReceivesDto dto)
         {
-            if (dto.Giftid <= 0 || dto.Participateid <= 0)
+            if (dto.GiftId <= 0 || dto.ParticipateId <= 0)
                 return BadRequest("GiftId and ParticipateId must be greater than zero");
 
             try
             {
-                if (Receives.Any(r => r.Giftid == dto.Giftid && r.Participateid == dto.Participateid))
+                if (Receives.Any(r => r.GiftId == dto.GiftId && r.ParticipateId == dto.ParticipateId))
                     return Conflict("This record already exists.");
 
                 Receives.Add(dto);
-                return CreatedAtAction(nameof(Get), new { giftId = dto.Giftid, participateId = dto.Participateid }, dto);
+                return CreatedAtAction(nameof(Get), new { giftId = dto.GiftId, participateId = dto.ParticipateId }, dto);
             }
             catch
             {
@@ -85,29 +126,30 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // PUT: api/receives/{giftId}/{participateId}
-        [HttpPut("{giftId}/{participateId}")]
-        [SwaggerOperation (
-            Summary = "Update a receive record",
-            Description = "Updates an existing receive record identified by GiftId and ParticipateId."
-            )]
+        
+        // PUT: api/receives/gift/{giftId}
+        [HttpPut("gift/{giftId}")]
+        [SwaggerOperation(
+            Summary = "Update receive record by GiftId",
+            Description = "Updates receive records identified by GiftId."
+        )]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public IActionResult Update(int giftId, int participateId, [FromBody] ReceivesDto dto)
+        public IActionResult UpdateByGiftId(int giftId, [FromBody] ReceivesDto dto)
         {
-            if (dto.Giftid <= 0 || dto.Participateid <= 0)
-                return BadRequest("GiftId and ParticipateId must be greater than zero");
+            if (giftId <= 0 || dto.GiftId <= 0)
+                return BadRequest("GiftId must be greater than zero");
 
             try
             {
-                var receive = Receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
+                var receive = Receives.FirstOrDefault(r => r.GiftId == giftId);
                 if (receive == null)
                     return NotFound();
 
-                receive.Giftid = dto.Giftid;
-                receive.Participateid = dto.Participateid;
+                receive.GiftId = dto.GiftId;
+                receive.ParticipateId = dto.ParticipateId;
 
                 return NoContent();
             }
@@ -116,21 +158,76 @@ namespace SZL_Backend.Controllers
                 return StatusCode(500);
             }
         }
+        // PUT: api/receives/participate/{participateId}
+        [HttpPut("participate/{participateId}")]
+        [SwaggerOperation(
+            Summary = "Update receive record by ParticipateId",
+            Description = "Updates receive records identified by ParticipateId."
+        )]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult UpdateByParticipateId(int participateId, [FromBody] ReceivesDto dto)
+        {
+            if (participateId <= 0 || dto.ParticipateId <= 0)
+                return BadRequest("ParticipateId must be greater than zero");
 
-        // DELETE: api/receives/{giftId}/{participateId}
-        [HttpDelete("{giftId}/{participateId}")]
-        [SwaggerOperation (
-            Summary = "Delete a receive record",
-            Description = "Deletes an existing receive record identified by GiftId and ParticipateId."
-            )]
+            try
+            {
+                var receive = Receives.FirstOrDefault(r => r.ParticipateId == participateId);
+                if (receive == null)
+                    return NotFound();
+
+                receive.GiftId = dto.GiftId;
+                receive.ParticipateId = dto.ParticipateId;
+
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        // DELETE: api/receives/gift/{giftId}
+        [HttpDelete("gift/{giftId}")]
+        [SwaggerOperation(
+            Summary = "Delete receive record by GiftId",
+            Description = "Deletes receive records identified by GiftId."
+        )]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public IActionResult Delete(int giftId, int participateId)
+        public IActionResult DeleteByGiftId(int giftId)
         {
             try
             {
-                var receive = Receives.FirstOrDefault(r => r.Giftid == giftId && r.Participateid == participateId);
+                var receive = Receives.FirstOrDefault(r => r.GiftId == giftId);
+                if (receive == null)
+                    return NotFound();
+
+                Receives.Remove(receive);
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        // DELETE: api/receives/participate/{participateId}
+        [HttpDelete("participate/{participateId}")]
+        [SwaggerOperation(
+            Summary = "Delete receive record by ParticipateId",
+            Description = "Deletes receive records identified by ParticipateId."
+        )]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public IActionResult DeleteByParticipateId(int participateId)
+        {
+            try
+            {
+                var receive = Receives.FirstOrDefault(r => r.ParticipateId == participateId);
                 if (receive == null)
                     return NotFound();
 

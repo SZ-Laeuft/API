@@ -2,11 +2,11 @@ namespace SZL_Backend.Dto
 {
     public class RoundsDto
     {
-        public int Roundid { get; set; }
+        public int RoundId { get; set; }
 
-        public int? Participateid { get; set; }
+        public int? ParticipateId { get; set; }
 
-        public DateTime? Roundtimestamp { get; set; }
+        public DateTime? RoundTimeStamp { get; set; }
 
     }
 }
@@ -15,8 +15,8 @@ namespace SZL_Backend.Dto
 {
     public class RoundsCreateDto
     {
-        public int Participateid { get; set; }
+        public int ParticipateId { get; set; }
 
-        public DateTime? Roundtimestamp { get; set; }
+        public DateTime? RoundTimeStamp { get; set; }
     }
 }

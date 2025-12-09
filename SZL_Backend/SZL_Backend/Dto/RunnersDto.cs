@@ -2,7 +2,7 @@ namespace SZL_Backend.Dto
 {
     public class RunnersDto
     {
-        public int Runnerid { get; set; }
+        public int RunnerId { get; set; }
 
         public string? Firstname { get; set; }
 

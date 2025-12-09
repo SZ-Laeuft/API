@@ -26,11 +26,11 @@ namespace SZL_Backend.Controllers
                 var data = await context.Gifts
                     .Select(g => new GiftsDto
                     {
-                        Giftid = g.Giftid,
+                        GiftId = g.Giftid,
                         Name = g.Name,
                         Requirement = g.Requirement
                     })
-                    .OrderBy(g => g.Giftid)
+                    .OrderBy(g => g.GiftId)
                     .ToListAsync();
 
                 return Ok(data);
@@ -58,7 +58,7 @@ namespace SZL_Backend.Controllers
                     .Where(g => g.Giftid == id)
                     .Select(g => new GiftsDto
                     {
-                        Giftid = g.Giftid,
+                        GiftId = g.Giftid,
                         Name = g.Name,
                         Requirement = g.Requirement
                     })
@@ -102,7 +102,7 @@ namespace SZL_Backend.Controllers
 
                 var result = new GiftsDto
                 {
-                    Giftid = gift.Giftid,
+                    GiftId = gift.Giftid,
                     Name = gift.Name,
                     Requirement = gift.Requirement
                 };

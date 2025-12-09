@@ -2,7 +2,7 @@ namespace SZL_Backend.Dto
 {
     public class GiftsDto
     {
-        public int Giftid { get; set; }
+        public int GiftId { get; set; }
 
         public string? Name { get; set; }
 

@@ -26,15 +26,15 @@ namespace SZL_Backend.Controllers
                 var data = await context.Events
                     .Select(e => new EventsDto
                     {
-                        Eventid = e.Eventid,
+                        EventId = e.Eventid,
                         Name = e.Name,
                         Place = e.Place,
-                        Isactive = e.Isactive,
-                        Starttime = e.Starttime,
-                        Endtime = e.Endtime,
+                        IsActive = e.Isactive,
+                        StartTime = e.Starttime,
+                        EndTime = e.Endtime,
                         Categoryid = e.Categoryid
                     })
-                    .OrderBy(e => e.Eventid)
+                    .OrderBy(e => e.EventId)
                     .ToListAsync();
 
                 return Ok(data);
@@ -62,12 +62,12 @@ namespace SZL_Backend.Controllers
                     .Where(e => e.Eventid == id)
                     .Select(e => new EventsDto
                     {
-                        Eventid = e.Eventid,
+                        EventId = e.Eventid,
                         Name = e.Name,
                         Place = e.Place,
-                        Isactive = e.Isactive,
-                        Starttime = e.Starttime,
-                        Endtime = e.Endtime,
+                        IsActive = e.Isactive,
+                        StartTime = e.Starttime,
+                        EndTime = e.Endtime,
                         Categoryid = e.Categoryid
                     })
                     .FirstOrDefaultAsync();
@@ -103,10 +103,10 @@ namespace SZL_Backend.Controllers
                 {
                     Name = dto.Name,
                     Place = dto.Place,
-                    Isactive = dto.Isactive,
-                    Starttime = dto.Starttime,
-                    Endtime = dto.Endtime,
-                    Categoryid = dto.Categoryid
+                    Isactive = dto.IsActive,
+                    Starttime = dto.StartTime,
+                    Endtime = dto.EndTime,
+                    Categoryid = dto.CategoryId
                 };
 
                 context.Events.Add(evt);
@@ -114,12 +114,12 @@ namespace SZL_Backend.Controllers
 
                 var result = new EventsDto
                 {
-                    Eventid = evt.Eventid,
+                    EventId = evt.Eventid,
                     Name = evt.Name,
                     Place = evt.Place,
-                    Isactive = evt.Isactive,
-                    Starttime = evt.Starttime,
-                    Endtime = evt.Endtime,
+                    IsActive = evt.Isactive,
+                    StartTime = evt.Starttime,
+                    EndTime = evt.Endtime,
                     Categoryid = evt.Categoryid
                 };
 
@@ -154,10 +154,10 @@ namespace SZL_Backend.Controllers
 
                 evt.Name = dto.Name;
                 evt.Place = dto.Place;
-                evt.Isactive = dto.Isactive;
-                evt.Starttime = dto.Starttime;
-                evt.Endtime = dto.Endtime;
-                evt.Categoryid = dto.Categoryid;
+                evt.Isactive = dto.IsActive;
+                evt.Starttime = dto.StartTime;
+                evt.Endtime = dto.EndTime;
+                evt.Categoryid = dto.CategoryId;
 
                 await context.SaveChangesAsync();
 

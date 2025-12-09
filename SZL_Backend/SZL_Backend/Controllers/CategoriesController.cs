@@ -27,7 +27,7 @@ namespace SZL_Backend.Controllers
                 var data = await context.Categories
                     .Select(c => new CategoriesDto
                     {
-                        Categoryid = c.Categoryid,
+                        CategoryId = c.Categoryid,
                         Name = c.Name
                     })
                     .OrderBy(c => c.Name)
@@ -57,10 +57,10 @@ namespace SZL_Backend.Controllers
                 var category = await context.Categories
                     .Select(c => new CategoriesDto
                     {
-                        Categoryid = c.Categoryid,
+                        CategoryId = c.Categoryid,
                         Name = c.Name
                     })
-                    .FirstOrDefaultAsync(c => c.Categoryid == id);
+                    .FirstOrDefaultAsync(c => c.CategoryId == id);
 
                 if (category == null)
                     return NotFound();
@@ -83,7 +83,7 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(409)] 
         [ProducesResponseType(500)] 
-        public async Task<IActionResult> PostCategory(CategorysCreateDto dto)
+        public async Task<IActionResult> PostCategory(CategoriesCreateDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Name))
                 return BadRequest("Name cannot be empty");
@@ -100,7 +100,7 @@ namespace SZL_Backend.Controllers
 
                 var result = new CategoriesDto
                 {
-                    Categoryid = category.Categoryid,
+                    CategoryId = category.Categoryid,
                     Name = category.Name
                 };
 
@@ -122,7 +122,7 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(400)] 
         [ProducesResponseType(404)]
         [ProducesResponseType(500)] 
-        public async Task<IActionResult> PutCategory(int id, CategorysCreateDto dto)
+        public async Task<IActionResult> PutCategory(int id, CategoriesCreateDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Name))
                 return BadRequest("Name cannot be empty");

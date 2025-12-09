@@ -26,11 +26,11 @@ namespace SZL_Backend.Controllers
                 var data = await context.Donations
                     .Select(d => new DonationsDto
                     {
-                        Donationid = d.Donationid,
-                        Participateid = d.Participateid,
+                        DonationId = d.Donationid,
+                        ParticipateId = d.Participateid,
                         Amount = d.Amount
                     })
-                    .OrderBy(d => d.Donationid)
+                    .OrderBy(d => d.DonationId)
                     .ToListAsync();
 
                 return Ok(data);
@@ -42,15 +42,15 @@ namespace SZL_Backend.Controllers
         }
 
         // GET: api/donations/5
-        [HttpGet("{id}")]
+        [HttpGet("by-donation/{donationid}")]
         [SwaggerOperation(
-            Summary = "Get donation by ID",
+            Summary = "Get donation by donationId",
             Description = "Retrieves a specific donation by its unique ID."
         )]
         [ProducesResponseType(typeof(DonationsDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetDonation(int id)
+        public async Task<IActionResult> GetDonationDonationId(int id)
         {
             try
             {
@@ -58,8 +58,42 @@ namespace SZL_Backend.Controllers
                     .Where(d => d.Donationid == id)
                     .Select(d => new DonationsDto
                     {
-                        Donationid = d.Donationid,
-                        Participateid = d.Participateid,
+                        DonationId = d.Donationid,
+                        ParticipateId = d.Participateid,
+                        Amount = d.Amount
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (donation == null)
+                    return NotFound();
+
+                return Ok(donation);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        
+        // GET: api/donations/5
+        [HttpGet("by-participate/{participateid}")]
+        [SwaggerOperation(
+            Summary = "Get donation by participateId",
+            Description = "Retrieves a specific donation by its unique ID."
+        )]
+        [ProducesResponseType(typeof(DonationsDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetDonationParticipateId(int participateid)
+        {
+            try
+            {
+                var donation = await context.Donations
+                    .Where(d => d.Participateid == participateid)
+                    .Select(d => new DonationsDto
+                    {
+                        DonationId = d.Donationid,
+                        ParticipateId = d.Participateid,
                         Amount = d.Amount
                     })
                     .FirstOrDefaultAsync();
@@ -75,46 +109,73 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // POST: api/donations
+        // Post: api/donations/
         [HttpPost]
         [SwaggerOperation(
-            Summary = "Create a new donation",
-            Description = "Creates a new donation record with the provided details."
+            Summary = "Create or Merge a donation",
+            Description = "If a donation exists for this participant, add the amount. Otherwise, create a new record."
         )]
         [ProducesResponseType(typeof(DonationsDto), 201)]
+        [ProducesResponseType(typeof(DonationsDto), 200)] 
         [ProducesResponseType(400)]
-        [ProducesResponseType(409)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> PostDonation(DonationsCreateDto dto)
         {
             if (dto.Amount <= 0)
                 return BadRequest("Amount must be greater than zero");
+            using var transaction = await context.Database.BeginTransactionAsync();
 
             try
             {
+                var existingDonation = await context.Donations
+                    .FirstOrDefaultAsync(d => d.Participateid == dto.ParticipateId);
+
+                if (existingDonation != null)
+                {
+                   
+                    existingDonation.Amount += dto.Amount;
+
+                    await context.SaveChangesAsync();
+                    await transaction.CommitAsync(); 
+
+                    var updatedResult = new DonationsDto
+                    {
+                        DonationId = existingDonation.Donationid,
+                        ParticipateId = existingDonation.Participateid,
+                        Amount = existingDonation.Amount
+                    };
+
+                    
+                    return Ok(updatedResult);
+                }
+                
                 var donation = new Donation
                 {
-                    Participateid = dto.Participateid,
+                    Participateid = dto.ParticipateId,
                     Amount = dto.Amount
                 };
 
                 context.Donations.Add(donation);
                 await context.SaveChangesAsync();
+                await transaction.CommitAsync();
 
-                var result = new DonationsDto
+                var createdResult = new DonationsDto
                 {
-                    Donationid = donation.Donationid,
-                    Participateid = donation.Participateid,
+                    DonationId = donation.Donationid,
+                    ParticipateId = donation.Participateid,
                     Amount = donation.Amount
                 };
 
-                return CreatedAtAction(nameof(GetDonation), new { id = donation.Donationid }, result);
+                return CreatedAtAction(nameof(GetDonationDonationId), new { id = donation.Donationid }, createdResult);
             }
-            catch
+            catch (Exception ex)
             {
-                return StatusCode(500);
+                await transaction.RollbackAsync();
+                return StatusCode(500, "An error occurred processing the donation.");
             }
         }
+
+
 
         // PUT: api/donations/5
         [HttpPut("{id}")]
@@ -137,7 +198,7 @@ namespace SZL_Backend.Controllers
                 if (donation == null)
                     return NotFound();
 
-                donation.Participateid = dto.Participateid;
+                donation.Participateid = dto.ParticipateId;
                 donation.Amount = dto.Amount;
 
                 await context.SaveChangesAsync();

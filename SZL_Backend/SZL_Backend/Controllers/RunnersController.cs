@@ -26,11 +26,11 @@ namespace SZL_Backend.Controllers
                 var data = await context.Runners
                     .Select(r => new RunnersDto
                     {
-                        Runnerid = r.Runnerid,
+                        RunnerId = r.Runnerid,
                         Firstname = r.Firstname,
                         Lastname = r.Lastname
                     })
-                    .OrderBy(r => r.Runnerid)
+                    .OrderBy(r => r.RunnerId)
                     .ToListAsync();
 
                 return Ok(data);
@@ -58,7 +58,7 @@ namespace SZL_Backend.Controllers
                     .Where(r => r.Runnerid == id)
                     .Select(r => new RunnersDto
                     {
-                        Runnerid = r.Runnerid,
+                        RunnerId = r.Runnerid,
                         Firstname = r.Firstname,
                         Lastname = r.Lastname
                     })
@@ -102,7 +102,7 @@ namespace SZL_Backend.Controllers
 
                 var result = new RunnersDto
                 {
-                    Runnerid = runner.Runnerid,
+                    RunnerId = runner.Runnerid,
                     Firstname = runner.Firstname,
                     Lastname = runner.Lastname
                 };

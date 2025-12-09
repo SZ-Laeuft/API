@@ -109,19 +109,19 @@ public partial class SZLDbContext : DbContext
                 .UsingEntity<Dictionary<string, object>>(
                     "Receife",
                     r => r.HasOne<Participate>().WithMany()
-                        .HasForeignKey("Participateid")
+                        .HasForeignKey("ParticipateId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("fk_participateid_receives"),
                     l => l.HasOne<Gift>().WithMany()
-                        .HasForeignKey("Giftid")
+                        .HasForeignKey("GiftId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("fk_giftid_receives"),
                     j =>
                     {
-                        j.HasKey("Giftid", "Participateid").HasName("receives_pkey");
+                        j.HasKey("GiftId", "ParticipateId").HasName("receives_pkey");
                         j.ToTable("receives");
-                        j.IndexerProperty<int>("Giftid").HasColumnName("giftid");
-                        j.IndexerProperty<int>("Participateid").HasColumnName("participateid");
+                        j.IndexerProperty<int>("GiftId").HasColumnName("giftid");
+                        j.IndexerProperty<int>("ParticipateId").HasColumnName("participateid");
                     });
         });
 

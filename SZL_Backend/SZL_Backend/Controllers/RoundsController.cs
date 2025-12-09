@@ -26,11 +26,11 @@ namespace SZL_Backend.Controllers
                 var data = await context.Rounds
                     .Select(r => new RoundsDto
                     {
-                        Roundid = r.Roundid,
-                        Participateid = r.Participateid,
-                        Roundtimestamp = r.Roundtimestamp
+                        RoundId = r.Roundid,
+                        ParticipateId = r.Participateid,
+                        RoundTimeStamp = r.Roundtimestamp
                     })
-                    .OrderBy(r => r.Roundid)
+                    .OrderBy(r => r.RoundId)
                     .ToListAsync();
 
                 return Ok(data);
@@ -42,25 +42,59 @@ namespace SZL_Backend.Controllers
         }
 
         // GET: api/rounds/5
-        [HttpGet("{id}")]
+        [HttpGet("by-roundId/{roundId}")]
         [SwaggerOperation(
-            Summary = "Get round by ID",
+            Summary = "Get round by  round ID",
             Description = "Retrieves a specific round by its unique ID."
         )]
         [ProducesResponseType(typeof(RoundsDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetRound(int id)
+        public async Task<IActionResult> GetRoundRoundId(int roundId)
         {
             try
             {
                 var round = await context.Rounds
-                    .Where(r => r.Roundid == id)
+                    .Where(r => r.Roundid == roundId)
                     .Select(r => new RoundsDto
                     {
-                        Roundid = r.Roundid,
-                        Participateid = r.Participateid,
-                        Roundtimestamp = r.Roundtimestamp
+                        RoundId = r.Roundid,
+                        ParticipateId = r.Participateid,
+                        RoundTimeStamp = r.Roundtimestamp
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (round == null)
+                    return NotFound();
+
+                return Ok(round);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        
+        // GET: api/rounds/5
+        [HttpGet("by-participateId/{participateId}")]
+        [SwaggerOperation(
+            Summary = "Get round by participate ID",
+            Description = "Retrieves a specific round by its unique ID."
+        )]
+        [ProducesResponseType(typeof(RoundsDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetRoundParticipateId(int participateId)
+        {
+            try
+            {
+                var round = await context.Rounds
+                    .Where(r => r.Participateid == participateId)
+                    .Select(r => new RoundsDto
+                    {
+                        RoundId = r.Roundid,
+                        ParticipateId = r.Participateid,
+                        RoundTimeStamp = r.Roundtimestamp
                     })
                     .FirstOrDefaultAsync();
 
@@ -86,15 +120,15 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> PostRound(RoundsCreateDto dto)
         {
-            if (dto.Participateid <= 0)
+            if (dto.ParticipateId <= 0)
                 return BadRequest("ParticipateId must be greater than zero");
 
             try
             {
                 var round = new Round
                 {
-                    Participateid = dto.Participateid,
-                    Roundtimestamp = dto.Roundtimestamp
+                    Participateid = dto.ParticipateId,
+                    Roundtimestamp = dto.RoundTimeStamp
                 };
 
                 context.Rounds.Add(round);
@@ -102,12 +136,12 @@ namespace SZL_Backend.Controllers
 
                 var result = new RoundsDto
                 {
-                    Roundid = round.Roundid,
-                    Participateid = round.Participateid,
-                    Roundtimestamp = round.Roundtimestamp
+                    RoundId = round.Roundid,
+                    ParticipateId = round.Participateid,
+                    RoundTimeStamp = round.Roundtimestamp
                 };
 
-                return CreatedAtAction(nameof(GetRound), new { id = round.Roundid }, result);
+                return CreatedAtAction(nameof(GetRoundRoundId), new { id = round.Roundid }, result);
             }
             catch
             {
@@ -127,7 +161,7 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> PutRound(int id, RoundsCreateDto dto)
         {
-            if (dto.Participateid <= 0)
+            if (dto.ParticipateId <= 0)
                 return BadRequest("ParticipateId must be greater than zero");
 
             try
@@ -136,8 +170,8 @@ namespace SZL_Backend.Controllers
                 if (round == null)
                     return NotFound();
 
-                round.Participateid = dto.Participateid;
-                round.Roundtimestamp = dto.Roundtimestamp;
+                round.Participateid = dto.ParticipateId;
+                round.Roundtimestamp = dto.RoundTimeStamp;
 
                 await context.SaveChangesAsync();
 

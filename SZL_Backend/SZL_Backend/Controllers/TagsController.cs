@@ -26,10 +26,10 @@ namespace SZL_Backend.Controllers
                 var data = await context.Tags
                     .Select(t => new TagsDto
                     {
-                        Tagid = t.Tagid,
+                        TagId = t.Tagid,
                         Status = t.Status
                     })
-                    .OrderBy(t => t.Tagid)
+                    .OrderBy(t => t.TagId)
                     .ToListAsync();
 
                 return Ok(data);
@@ -54,10 +54,9 @@ namespace SZL_Backend.Controllers
             try
             {
                 var tag = await context.Tags
-                    .Where(t => t.Tagid == id)
                     .Select(t => new TagsDto
                     {
-                        Tagid = t.Tagid,
+                        TagId = t.Tagid,
                         Status = t.Status
                     })
                     .FirstOrDefaultAsync();
@@ -91,6 +90,7 @@ namespace SZL_Backend.Controllers
             {
                 var tag = new Tag
                 {
+                    Tagid = (int)dto.TagId!,
                     Status = dto.Status
                 };
 
@@ -99,7 +99,7 @@ namespace SZL_Backend.Controllers
 
                 var result = new TagsDto
                 {
-                    Tagid = tag.Tagid,
+                    TagId = tag.Tagid,
                     Status = tag.Status
                 };
 
