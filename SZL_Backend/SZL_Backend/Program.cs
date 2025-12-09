@@ -31,8 +31,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 {
     throw new InvalidOperationException(
         "Connection string 'DefaultConnection' is not set. " +
-        "If you are using user-secrets, run dotnet user-secrets set \"ConnectionStrings:DefaultConnection\" \"<conn>\" " +
-        "and ensure ASPNETCORE_ENVIRONMENT=Development or that you've called AddUserSecrets.");
+        "If you are on your personal device run dotnet user-secrets set \"ConnectionStrings:DefaultConnectionString\" \"<conn>\" ");
 }
 
 builder.Services.AddDbContext<SZLDbContext>(options =>
