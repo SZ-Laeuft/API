@@ -1,0 +1,20 @@
+﻿services:
+  szl_backend:
+    container_name: szl_backend
+    image: szl_backend
+    build:
+      context: .
+      dockerfile: SZL_Backend/Dockerfile
+      args:
+        APP_UID: 1000
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    restart: unless-stopped
+
+
+    
+
