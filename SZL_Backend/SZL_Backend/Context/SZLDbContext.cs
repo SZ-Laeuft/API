@@ -73,7 +73,7 @@ public partial class SZLDbContext : DbContext
             entity.Property(e => e.Eventid).HasColumnName("eventid");
             entity.Property(e => e.Categoryid).HasColumnName("categoryid");
             entity.Property(e => e.Endtime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("endtime");
             entity.Property(e => e.Isactive)
                 .HasMaxLength(30)
@@ -85,7 +85,7 @@ public partial class SZLDbContext : DbContext
                 .HasMaxLength(30)
                 .HasColumnName("place");
             entity.Property(e => e.Starttime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("starttime");
 
             entity.HasOne(d => d.Category).WithMany(p => p.Events)
@@ -163,7 +163,7 @@ public partial class SZLDbContext : DbContext
             entity.Property(e => e.Roundid).HasColumnName("roundid");
             entity.Property(e => e.Participateid).HasColumnName("participateid");
             entity.Property(e => e.Roundtimestamp)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("roundtimestamp");
 
             entity.HasOne(d => d.Participate).WithMany(p => p.Rounds)

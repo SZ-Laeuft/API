@@ -141,7 +141,7 @@ namespace SZL_Backend.Controllers
                     RoundTimeStamp = round.Roundtimestamp
                 };
 
-                return CreatedAtAction(nameof(GetRoundRoundId), new { id = round.Roundid }, result);
+                return CreatedAtAction(nameof(GetRoundRoundId), new { roundId = round.Roundid }, result);
             }
             catch
             {
