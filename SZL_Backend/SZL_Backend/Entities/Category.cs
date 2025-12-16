@@ -9,5 +9,5 @@ public partial class Category
 
     public string Name { get; set; } = null!;
 
-    public virtual ICollection<Event> Events { get; set; } = new List<Event>();
+    public virtual ICollection<Participate> Participates { get; set; } = new List<Participate>();
 }

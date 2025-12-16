@@ -15,7 +15,9 @@ public partial class SZLDbContext : DbContext
         : base(options)
     {
     }
-    
+
+    public virtual DbSet<Besttime> Besttimes { get; set; }
+
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<Donation> Donations { get; set; }
@@ -33,10 +35,28 @@ public partial class SZLDbContext : DbContext
     public virtual DbSet<Tag> Tags { get; set; }
 
     public virtual DbSet<Team> Teams { get; set; }
-    
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseNpgsql("Host=100.94.128.1;Port=5432;Database=szl;Username=admin;Password=Szl-20010901");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Besttime>(entity =>
+        {
+            entity.HasKey(e => e.Besttimeid).HasName("besttime_pkey");
+
+            entity.ToTable("besttime");
+
+            entity.Property(e => e.Besttimeid).HasColumnName("besttimeid");
+            entity.Property(e => e.Besttime1).HasColumnName("besttime");
+            entity.Property(e => e.ParticipateId).HasColumnName("participateId");
+
+            entity.HasOne(d => d.Participate).WithMany(p => p.Besttimes)
+                .HasForeignKey(d => d.ParticipateId)
+                .HasConstraintName("fk_participateId_besttime");
+        });
+
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.Categoryid).HasName("category_pkey");
@@ -71,10 +91,7 @@ public partial class SZLDbContext : DbContext
             entity.ToTable("event");
 
             entity.Property(e => e.Eventid).HasColumnName("eventid");
-            entity.Property(e => e.Categoryid).HasColumnName("categoryid");
-            entity.Property(e => e.Endtime)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("endtime");
+            entity.Property(e => e.Endtime).HasColumnName("endtime");
             entity.Property(e => e.Isactive)
                 .HasMaxLength(30)
                 .HasColumnName("isactive");
@@ -84,13 +101,7 @@ public partial class SZLDbContext : DbContext
             entity.Property(e => e.Place)
                 .HasMaxLength(30)
                 .HasColumnName("place");
-            entity.Property(e => e.Starttime)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("starttime");
-
-            entity.HasOne(d => d.Category).WithMany(p => p.Events)
-                .HasForeignKey(d => d.Categoryid)
-                .HasConstraintName("fk_category_event");
+            entity.Property(e => e.Starttime).HasColumnName("starttime");
         });
 
         modelBuilder.Entity<Gift>(entity =>
@@ -109,19 +120,19 @@ public partial class SZLDbContext : DbContext
                 .UsingEntity<Dictionary<string, object>>(
                     "Receife",
                     r => r.HasOne<Participate>().WithMany()
-                        .HasForeignKey("ParticipateId")
+                        .HasForeignKey("Participateid")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("fk_participateid_receives"),
                     l => l.HasOne<Gift>().WithMany()
-                        .HasForeignKey("GiftId")
+                        .HasForeignKey("Giftid")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("fk_giftid_receives"),
                     j =>
                     {
-                        j.HasKey("GiftId", "ParticipateId").HasName("receives_pkey");
+                        j.HasKey("Giftid", "Participateid").HasName("receives_pkey");
                         j.ToTable("receives");
-                        j.IndexerProperty<int>("GiftId").HasColumnName("giftid");
-                        j.IndexerProperty<int>("ParticipateId").HasColumnName("participateid");
+                        j.IndexerProperty<int>("Giftid").HasColumnName("giftid");
+                        j.IndexerProperty<int>("Participateid").HasColumnName("participateid");
                     });
         });
 
@@ -132,10 +143,15 @@ public partial class SZLDbContext : DbContext
             entity.ToTable("participate");
 
             entity.Property(e => e.Participateid).HasColumnName("participateid");
+            entity.Property(e => e.CategoryId).HasColumnName("categoryId");
             entity.Property(e => e.Eventid).HasColumnName("eventid");
             entity.Property(e => e.Runnerid).HasColumnName("runnerid");
             entity.Property(e => e.Tagid).HasColumnName("tagid");
             entity.Property(e => e.Teamid).HasColumnName("teamid");
+
+            entity.HasOne(d => d.Category).WithMany(p => p.Participates)
+                .HasForeignKey(d => d.CategoryId)
+                .HasConstraintName("fk_categoryid_participate");
 
             entity.HasOne(d => d.Event).WithMany(p => p.Participates)
                 .HasForeignKey(d => d.Eventid)
@@ -162,9 +178,8 @@ public partial class SZLDbContext : DbContext
 
             entity.Property(e => e.Roundid).HasColumnName("roundid");
             entity.Property(e => e.Participateid).HasColumnName("participateid");
-            entity.Property(e => e.Roundtimestamp)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("roundtimestamp");
+            entity.Property(e => e.Roundtime).HasColumnName("roundtime");
+            entity.Property(e => e.Roundtimestamp).HasColumnName("roundtimestamp");
 
             entity.HasOne(d => d.Participate).WithMany(p => p.Rounds)
                 .HasForeignKey(d => d.Participateid)
@@ -192,7 +207,9 @@ public partial class SZLDbContext : DbContext
 
             entity.ToTable("tag");
 
-            entity.Property(e => e.Tagid).HasColumnName("tagid");
+            entity.Property(e => e.Tagid)
+                .ValueGeneratedNever()
+                .HasColumnName("tagid");
             entity.Property(e => e.Status)
                 .HasMaxLength(30)
                 .HasColumnName("status");

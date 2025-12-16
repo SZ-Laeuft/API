@@ -7,7 +7,7 @@ public partial class Tag
 {
     public int Tagid { get; set; }
 
-    public string? Status { get; set; }
+    public string Status { get; set; } = null!;
 
     public virtual ICollection<Participate> Participates { get; set; } = new List<Participate>();
 }

@@ -108,6 +108,30 @@ namespace SZL_Backend.Controllers
                 return StatusCode(500);
             }
         }
+        
+        // GET: api/rounds/5
+        [HttpGet("get-round-count/{participateId}")]
+        [SwaggerOperation(
+            Summary = "Get amount of rounds",
+            Description = "Retrieves amount of rounds by its unique ID."
+        )]
+        [ProducesResponseType(typeof(RoundsDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetAllRoundsParticipateId(int participateId)
+        {
+            try
+            {
+                var rounds = await context.Rounds
+                    .Where(r => r.Participateid == participateId)
+                    .CountAsync();
+                return Ok(rounds);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
 
         // POST: api/rounds
         [HttpPost]

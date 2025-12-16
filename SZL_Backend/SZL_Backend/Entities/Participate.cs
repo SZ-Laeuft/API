@@ -9,11 +9,17 @@ public partial class Participate
 
     public int? Teamid { get; set; }
 
-    public int? Tagid { get; set; }
-
     public int? Runnerid { get; set; }
 
     public int? Eventid { get; set; }
+
+    public int? Tagid { get; set; }
+
+    public int? CategoryId { get; set; }
+
+    public virtual ICollection<Besttime> Besttimes { get; set; } = new List<Besttime>();
+
+    public virtual Category? Category { get; set; }
 
     public virtual ICollection<Donation> Donations { get; set; } = new List<Donation>();
 

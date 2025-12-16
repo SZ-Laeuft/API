@@ -17,9 +17,5 @@ public partial class Event
 
     public DateTime? Endtime { get; set; }
 
-    public int? Categoryid { get; set; }
-
-    public virtual Category? Category { get; set; }
-
     public virtual ICollection<Participate> Participates { get; set; } = new List<Participate>();
 }

@@ -32,7 +32,6 @@ namespace SZL_Backend.Controllers
                         IsActive = e.Isactive,
                         StartTime = e.Starttime,
                         EndTime = e.Endtime,
-                        Categoryid = e.Categoryid
                     })
                     .OrderBy(e => e.EventId)
                     .ToListAsync();
@@ -68,7 +67,7 @@ namespace SZL_Backend.Controllers
                         IsActive = e.Isactive,
                         StartTime = e.Starttime,
                         EndTime = e.Endtime,
-                        Categoryid = e.Categoryid
+                        
                     })
                     .FirstOrDefaultAsync();
 
@@ -106,7 +105,6 @@ namespace SZL_Backend.Controllers
                     Isactive = dto.IsActive,
                     Starttime = dto.StartTime,
                     Endtime = dto.EndTime,
-                    Categoryid = dto.CategoryId
                 };
 
                 context.Events.Add(evt);
@@ -120,7 +118,6 @@ namespace SZL_Backend.Controllers
                     IsActive = evt.Isactive,
                     StartTime = evt.Starttime,
                     EndTime = evt.Endtime,
-                    Categoryid = evt.Categoryid
                 };
 
                 return CreatedAtAction(nameof(GetEvent), new { id = evt.Eventid }, result);
@@ -157,7 +154,6 @@ namespace SZL_Backend.Controllers
                 evt.Isactive = dto.IsActive;
                 evt.Starttime = dto.StartTime;
                 evt.Endtime = dto.EndTime;
-                evt.Categoryid = dto.CategoryId;
 
                 await context.SaveChangesAsync();
 
