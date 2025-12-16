@@ -193,9 +193,13 @@ public partial class SZLDbContext : DbContext
             entity.ToTable("runner");
 
             entity.Property(e => e.Runnerid).HasColumnName("runnerid");
+            entity.Property(e => e.Birthdate).HasColumnName("birthdate");
             entity.Property(e => e.Firstname)
                 .HasMaxLength(30)
                 .HasColumnName("firstname");
+            entity.Property(e => e.Gender)
+                .HasMaxLength(30)
+                .HasColumnName("gender");
             entity.Property(e => e.Lastname)
                 .HasMaxLength(30)
                 .HasColumnName("lastname");

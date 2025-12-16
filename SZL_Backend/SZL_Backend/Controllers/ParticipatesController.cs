@@ -30,7 +30,8 @@ namespace SZL_Backend.Controllers
                         TeamId = p.Teamid,
                         TagId = p.Tagid,
                         RunnerId = p.Runnerid,
-                        EventId = p.Eventid
+                        EventId = p.Eventid,
+                        CategoryId = p.CategoryId
                     })
                     .OrderBy(p => p.ParticipateId)
                     .ToListAsync();
@@ -64,7 +65,8 @@ namespace SZL_Backend.Controllers
                         TeamId = p.Teamid,
                         TagId = p.Tagid,
                         RunnerId = p.Runnerid,
-                        EventId = p.Eventid
+                        EventId = p.Eventid,
+                        CategoryId = p.CategoryId
                     })
                     .FirstOrDefaultAsync();
 
@@ -100,7 +102,8 @@ namespace SZL_Backend.Controllers
                         TeamId = p.Teamid,
                         TagId = p.Tagid,
                         RunnerId = p.Runnerid,
-                        EventId = p.Eventid
+                        EventId = p.Eventid,
+                        CategoryId = p.CategoryId
                     })
                     .FirstOrDefaultAsync();
 
@@ -136,7 +139,8 @@ namespace SZL_Backend.Controllers
                     Teamid = dto.TeamId,
                     Tagid = dto.TagId,
                     Runnerid = dto.RunnerId,
-                    Eventid = dto.EventId
+                    Eventid = dto.EventId,
+                    CategoryId = dto.CategoryId
                 };
 
                 context.Participates.Add(participate);
@@ -148,7 +152,8 @@ namespace SZL_Backend.Controllers
                     TeamId = participate.Teamid,
                     TagId = participate.Tagid,
                     RunnerId = participate.Runnerid,
-                    EventId = participate.Eventid
+                    EventId = participate.Eventid,
+                    CategoryId = participate.CategoryId
                 };
 
                 return CreatedAtAction(nameof(GetParticipateParticipateId), new { id = participate.Participateid }, result);
@@ -184,6 +189,7 @@ namespace SZL_Backend.Controllers
                 participate.Tagid = dto.TagId;
                 participate.Runnerid = dto.RunnerId;
                 participate.Eventid = dto.EventId;
+                participate.CategoryId = dto.CategoryId;
 
                 await context.SaveChangesAsync();
 

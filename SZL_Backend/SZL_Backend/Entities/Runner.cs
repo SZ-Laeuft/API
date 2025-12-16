@@ -11,5 +11,9 @@ public partial class Runner
 
     public string? Lastname { get; set; }
 
+    public string? Gender { get; set; }
+
+    public DateOnly? Birthdate { get; set; }
+
     public virtual ICollection<Participate> Participates { get; set; } = new List<Participate>();
 }

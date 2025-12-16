@@ -7,6 +7,10 @@ namespace SZL_Backend.Dto
         public string? Firstname { get; set; }
 
         public string? Lastname { get; set; }
+        
+        public string? Gender { get; set; }
+
+        public DateOnly? Birthdate { get; set; }
     }
 }
 
@@ -17,5 +21,9 @@ namespace SZL_Backend.Dto
         public string? Firstname { get; set; }
 
         public string? Lastname { get; set; }
+        
+        public string? Gender { get; set; }
+
+        public DateOnly? Birthdate { get; set; }
     }
 }

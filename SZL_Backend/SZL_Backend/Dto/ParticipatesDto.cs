@@ -11,6 +11,9 @@ namespace SZL_Backend.Dto
         public int? RunnerId { get; set; }
 
         public int? EventId { get; set; }
+        
+        public int? CategoryId { get; set; }
+        
     }
 }
 
@@ -25,5 +28,7 @@ namespace SZL_Backend.Dto
         public int? RunnerId { get; set; }
 
         public int? EventId { get; set; }
+        
+        public int? CategoryId { get; set; }
     }
 }

@@ -28,7 +28,9 @@ namespace SZL_Backend.Controllers
                     {
                         RunnerId = r.Runnerid,
                         Firstname = r.Firstname,
-                        Lastname = r.Lastname
+                        Lastname = r.Lastname,
+                        Gender = r.Gender,
+                        Birthdate = r.Birthdate,
                     })
                     .OrderBy(r => r.RunnerId)
                     .ToListAsync();
@@ -60,7 +62,9 @@ namespace SZL_Backend.Controllers
                     {
                         RunnerId = r.Runnerid,
                         Firstname = r.Firstname,
-                        Lastname = r.Lastname
+                        Lastname = r.Lastname,
+                        Gender = r.Gender,
+                        Birthdate = r.Birthdate,
                     })
                     .FirstOrDefaultAsync();
 
@@ -94,7 +98,9 @@ namespace SZL_Backend.Controllers
                 var runner = new Runner
                 {
                     Firstname = dto.Firstname,
-                    Lastname = dto.Lastname
+                    Lastname = dto.Lastname,
+                    Gender = dto.Gender,
+                    Birthdate = dto.Birthdate,
                 };
 
                 context.Runners.Add(runner);
@@ -104,7 +110,9 @@ namespace SZL_Backend.Controllers
                 {
                     RunnerId = runner.Runnerid,
                     Firstname = runner.Firstname,
-                    Lastname = runner.Lastname
+                    Lastname = runner.Lastname,
+                    Gender = runner.Gender,
+                    Birthdate = runner.Birthdate,
                 };
 
                 return CreatedAtAction(nameof(GetRunner), new { id = runner.Runnerid }, result);
@@ -138,6 +146,8 @@ namespace SZL_Backend.Controllers
 
                 runner.Firstname = dto.Firstname;
                 runner.Lastname = dto.Lastname;
+                runner.Gender = dto.Gender;
+                runner.Birthdate = dto.Birthdate;
 
                 await context.SaveChangesAsync();
 

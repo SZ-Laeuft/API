@@ -26,11 +26,12 @@ namespace SZL_Backend.Controllers
                 var data = await context.Rounds
                     .Select(r => new RoundsDto
                     {
-                        RoundId = r.Roundid,
-                        ParticipateId = r.Participateid,
-                        RoundTimeStamp = r.Roundtimestamp
+                        Roundid = r.Roundid,
+                        Participateid = r.Participateid,
+                        Roundtimestamp = r.Roundtimestamp,
+                        Roundtime = r.Roundtime,
                     })
-                    .OrderBy(r => r.RoundId)
+                    .OrderBy(r => r.Roundid)
                     .ToListAsync();
 
                 return Ok(data);
@@ -58,9 +59,10 @@ namespace SZL_Backend.Controllers
                     .Where(r => r.Roundid == roundId)
                     .Select(r => new RoundsDto
                     {
-                        RoundId = r.Roundid,
-                        ParticipateId = r.Participateid,
-                        RoundTimeStamp = r.Roundtimestamp
+                        Roundid = r.Roundid,
+                        Participateid = r.Participateid,
+                        Roundtimestamp = r.Roundtimestamp,
+                        Roundtime = r.Roundtime,
                     })
                     .FirstOrDefaultAsync();
 
@@ -92,9 +94,10 @@ namespace SZL_Backend.Controllers
                     .Where(r => r.Participateid == participateId)
                     .Select(r => new RoundsDto
                     {
-                        RoundId = r.Roundid,
-                        ParticipateId = r.Participateid,
-                        RoundTimeStamp = r.Roundtimestamp
+                        Roundid = r.Roundid,
+                        Participateid = r.Participateid,
+                        Roundtimestamp = r.Roundtimestamp,
+                        Roundtime = r.Roundtime,
                     })
                     .FirstOrDefaultAsync();
 
@@ -144,15 +147,15 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> PostRound(RoundsCreateDto dto)
         {
-            if (dto.ParticipateId <= 0)
+            if (dto.Participateid <= 0)
                 return BadRequest("ParticipateId must be greater than zero");
 
             try
             {
                 var round = new Round
                 {
-                    Participateid = dto.ParticipateId,
-                    Roundtimestamp = dto.RoundTimeStamp
+                    Participateid = dto.Participateid,
+                    Roundtimestamp = dto.Roundtimestamp,
                 };
 
                 context.Rounds.Add(round);
@@ -160,9 +163,10 @@ namespace SZL_Backend.Controllers
 
                 var result = new RoundsDto
                 {
-                    RoundId = round.Roundid,
-                    ParticipateId = round.Participateid,
-                    RoundTimeStamp = round.Roundtimestamp
+                    Roundid = round.Roundid,
+                    Participateid = round.Participateid,
+                    Roundtimestamp = round.Roundtimestamp,
+                    Roundtime = round.Roundtime,
                 };
 
                 return CreatedAtAction(nameof(GetRoundRoundId), new { roundId = round.Roundid }, result);
@@ -185,7 +189,7 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> PutRound(int id, RoundsCreateDto dto)
         {
-            if (dto.ParticipateId <= 0)
+            if (dto.Participateid <= 0)
                 return BadRequest("ParticipateId must be greater than zero");
 
             try
@@ -194,8 +198,8 @@ namespace SZL_Backend.Controllers
                 if (round == null)
                     return NotFound();
 
-                round.Participateid = dto.ParticipateId;
-                round.Roundtimestamp = dto.RoundTimeStamp;
+                round.Participateid = dto.Participateid;
+                round.Roundtimestamp = dto.Roundtimestamp;
 
                 await context.SaveChangesAsync();
 
