@@ -17,8 +17,6 @@ public partial class Participate
 
     public int? CategoryId { get; set; }
 
-    public virtual ICollection<Besttime> Besttimes { get; set; } = new List<Besttime>();
-
     public virtual Category? Category { get; set; }
 
     public virtual ICollection<Donation> Donations { get; set; } = new List<Donation>();

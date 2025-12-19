@@ -16,7 +16,7 @@ public partial class SZLDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Besttime> Besttimes { get; set; }
+    public virtual DbSet<BestTimeView> BestTimeViews { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
 
@@ -42,19 +42,14 @@ public partial class SZLDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Besttime>(entity =>
+        modelBuilder.Entity<BestTimeView>(entity =>
         {
-            entity.HasKey(e => e.Besttimeid).HasName("besttime_pkey");
+            entity
+                .HasNoKey()
+                .ToView("BestTimeView");
 
-            entity.ToTable("besttime");
-
-            entity.Property(e => e.Besttimeid).HasColumnName("besttimeid");
-            entity.Property(e => e.Besttime1).HasColumnName("besttime");
-            entity.Property(e => e.ParticipateId).HasColumnName("participateId");
-
-            entity.HasOne(d => d.Participate).WithMany(p => p.Besttimes)
-                .HasForeignKey(d => d.ParticipateId)
-                .HasConstraintName("fk_participateId_besttime");
+            entity.Property(e => e.ParticipateId).HasColumnName("ParticipateID");
+            entity.Property(e => e.RoundId).HasColumnName("RoundID");
         });
 
         modelBuilder.Entity<Category>(entity =>

@@ -1,36 +1,35 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Swashbuckle.AspNetCore.Annotations;
 using SZL_Backend.Context;
 using SZL_Backend.Dto;
-using SZL_Backend.Entities;
 
 namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BestTimeController(SZLDbContext context) : ControllerBase
+    public class BestTimeController : ControllerBase
     {
+        private readonly SZLDbContext _context;
+
+        public BestTimeController(SZLDbContext context)
+        {
+            _context = context;
+        }
+
         // GET: api/besttime
         [HttpGet]
-        [SwaggerOperation(
-            Summary = "Get all best times",
-            Description = "Retrieves a list of all best times available in the system."
-        )]
-        [ProducesResponseType(typeof(IEnumerable<BestTimeDto>), 200)]
-        [ProducesResponseType(500)]
         public async Task<IActionResult> GetBestTimes()
         {
             try
             {
-                var data = await context.Besttimes
-                    .Select(b => new BestTimeDto
+                var data = await _context.BestTimeViews
+                    .Select(bt => new BestTimeViewDto
                     {
-                        Besttimeid = b.Besttimeid,
-                        Besttime1 = b.Besttime1,
-                        ParticipateId = b.ParticipateId
+                        ParticipateId = bt.ParticipateId,
+                        RoundId = bt.RoundId,
+                        BestTime = bt.BestTime
                     })
-                    .OrderBy(b => b.Besttimeid)
+                    .OrderBy(bt => bt.ParticipateId)
                     .ToListAsync();
 
                 return Ok(data);
@@ -41,127 +40,26 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // GET: api/besttime/5
-        [HttpGet("{id}")]
-        [SwaggerOperation(
-            Summary = "Get best time by ID",
-            Description = "Retrieves a specific best time by its unique ID."
-        )]
-        [ProducesResponseType(typeof(BestTimeDto), 200)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> GetBestTime(int id)
+        // GET: api/besttime/1
+        [HttpGet("{participateId}")]
+        public async Task<IActionResult> GetBestTimeByParticipateId(int participateId)
         {
             try
             {
-                var bestTime = await context.Besttimes
-                    .Select(b => new BestTimeDto
+                var bestTime = await _context.BestTimeViews
+                    .Where(bt => bt.ParticipateId == participateId)
+                    .Select(bt => new BestTimeViewDto
                     {
-                        Besttimeid = b.Besttimeid,
-                        Besttime1 = b.Besttime1,
-                        ParticipateId = b.ParticipateId
+                        ParticipateId = bt.ParticipateId,
+                        RoundId = bt.RoundId,
+                        BestTime = bt.BestTime
                     })
-                    .FirstOrDefaultAsync(b => b.Besttimeid == id);
+                    .FirstOrDefaultAsync();
 
                 if (bestTime == null)
                     return NotFound();
 
                 return Ok(bestTime);
-            }
-            catch
-            {
-                return StatusCode(500);
-            }
-        }
-
-        // POST: api/besttime
-        [HttpPost]
-        [SwaggerOperation(
-            Summary = "Create a new best time",
-            Description = "Creates a new best time entry."
-        )]
-        [ProducesResponseType(typeof(BestTimeDto), 201)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> PostBestTime(BestTimeCreateDto dto)
-        {
-            try
-            {
-                var bestTime = new Besttime
-                {
-                    Besttime1 = dto.Besttime1,
-                    ParticipateId = dto.ParticipateId
-                };
-
-                context.Besttimes.Add(bestTime);
-                await context.SaveChangesAsync();
-
-                var result = new BestTimeDto
-                {
-                    Besttimeid = bestTime.Besttimeid,
-                    Besttime1 = bestTime.Besttime1,
-                    ParticipateId = bestTime.ParticipateId
-                };
-
-                return CreatedAtAction(nameof(GetBestTime), new { id = bestTime.Besttimeid }, result);
-            }
-            catch
-            {
-                return StatusCode(500);
-            }
-        }
-
-        // PUT: api/besttime/5
-        [HttpPut("{id}")]
-        [SwaggerOperation(
-            Summary = "Update an existing best time",
-            Description = "Updates the details of an existing best time identified by its ID."
-        )]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> PutBestTime(int id, BestTimeCreateDto dto)
-        {
-            try
-            {
-                var bestTime = await context.Besttimes.FindAsync(id);
-                if (bestTime == null)
-                    return NotFound();
-
-                bestTime.Besttime1 = dto.Besttime1;
-                bestTime.ParticipateId = dto.ParticipateId;
-
-                await context.SaveChangesAsync();
-                return NoContent();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return StatusCode(500);
-            }
-        }
-
-        // DELETE: api/besttime/5
-        [HttpDelete("{id}")]
-        [SwaggerOperation(
-            Summary = "Delete a best time",
-            Description = "Deletes an existing best time identified by its ID."
-        )]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteBestTime(int id)
-        {
-            try
-            {
-                var bestTime = await context.Besttimes.FindAsync(id);
-                if (bestTime == null)
-                    return NotFound();
-
-                context.Besttimes.Remove(bestTime);
-                await context.SaveChangesAsync();
-
-                return NoContent();
             }
             catch
             {
