@@ -6,7 +6,7 @@ namespace SZL_Backend.Dto
 
         public int? TeamId { get; set; }
 
-        public int? TagId { get; set; }
+        public long? TagId { get; set; }
 
         public int? RunnerId { get; set; }
 
@@ -23,7 +23,7 @@ namespace SZL_Backend.Dto
     {
         public int? TeamId { get; set; }
 
-        public int? TagId { get; set; }
+        public long? TagId { get; set; }
 
         public int? RunnerId { get; set; }
 

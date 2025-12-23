@@ -5,7 +5,7 @@ namespace SZL_Backend.Entities;
 
 public partial class Tag
 {
-    public int Tagid { get; set; }
+    public long Tagid { get; set; }
 
     public string Status { get; set; } = null!;
 

@@ -13,7 +13,7 @@ public partial class Participate
 
     public int? Eventid { get; set; }
 
-    public int? Tagid { get; set; }
+    public long? Tagid { get; set; }
 
     public int? CategoryId { get; set; }
 
