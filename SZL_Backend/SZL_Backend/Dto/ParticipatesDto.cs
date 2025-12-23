@@ -29,6 +29,5 @@ namespace SZL_Backend.Dto
 
         public int? EventId { get; set; }
         
-        public int? CategoryId { get; set; }
     }
 }

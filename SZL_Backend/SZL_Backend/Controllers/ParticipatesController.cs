@@ -140,7 +140,6 @@ namespace SZL_Backend.Controllers
                     Tagid = dto.TagId,
                     Runnerid = dto.RunnerId,
                     Eventid = dto.EventId,
-                    CategoryId = dto.CategoryId
                 };
 
                 context.Participates.Add(participate);
@@ -189,7 +188,6 @@ namespace SZL_Backend.Controllers
                 participate.Tagid = dto.TagId;
                 participate.Runnerid = dto.RunnerId;
                 participate.Eventid = dto.EventId;
-                participate.CategoryId = dto.CategoryId;
 
                 await context.SaveChangesAsync();
 
