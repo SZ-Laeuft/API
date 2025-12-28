@@ -9,27 +9,34 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TagsController(SZLDbContext context) : ControllerBase
+    public class TagsController : ControllerBase
     {
+        private readonly SZLDbContext _context;
+
+        public TagsController(SZLDbContext context)
+        {
+            _context = context;
+        }
+
         // GET: api/tags
         [HttpGet]
-        [SwaggerOperation (
-            Summary = "Get all tags" , 
+        [SwaggerOperation(
+            Summary = "Get all tags",
             Description = "Gets a list of all tags available"
-            )]
+        )]
         [ProducesResponseType(typeof(IEnumerable<TagsDto>), 200)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetTags()
         {
             try
             {
-                var data = await context.Tags
+                var data = await _context.Tags
+                    .OrderBy(t => t.Tagid)
                     .Select(t => new TagsDto
                     {
-                        TagId = t.Tagid,
+                        TagId = t.Tagid.ToString(),
                         Status = t.Status
                     })
-                    .OrderBy(t => t.TagId)
                     .ToListAsync();
 
                 return Ok(data);
@@ -40,23 +47,28 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // GET: api/tags/5
+        // GET: api/tags/{id}
         [HttpGet("{id}")]
-        [SwaggerOperation (
-            Summary = "Get tag by ID", 
+        [SwaggerOperation(
+            Summary = "Get tag by ID",
             Description = "Gets a specific tag by its unique ID."
-            )]
+        )]
         [ProducesResponseType(typeof(TagsDto), 200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetTag(int id)
+        public async Task<IActionResult> GetTag(string id)
         {
+            if (!long.TryParse(id, out var tagId))
+                return BadRequest("Invalid ID");
+
             try
             {
-                var tag = await context.Tags
+                var tag = await _context.Tags
+                    .Where(t => t.Tagid == tagId)
                     .Select(t => new TagsDto
                     {
-                        TagId = t.Tagid,
+                        TagId = t.Tagid.ToString(),
                         Status = t.Status
                     })
                     .FirstOrDefaultAsync();
@@ -74,10 +86,10 @@ namespace SZL_Backend.Controllers
 
         // POST: api/tags
         [HttpPost]
-        [SwaggerOperation (
-            Summary = "Create a new tag", 
+        [SwaggerOperation(
+            Summary = "Create a new tag",
             Description = "Creates a new tag with the provided information."
-            )]
+        )]
         [ProducesResponseType(typeof(TagsDto), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -86,24 +98,31 @@ namespace SZL_Backend.Controllers
             if (string.IsNullOrWhiteSpace(dto.Status))
                 return BadRequest("Status is required");
 
+            if (!long.TryParse(dto.TagId, out var tagId))
+                return BadRequest("Invalid TagId");
+
             try
             {
                 var tag = new Tag
                 {
-                    Tagid = (int)dto.TagId!,
+                    Tagid = tagId,
                     Status = dto.Status
                 };
 
-                context.Tags.Add(tag);
-                await context.SaveChangesAsync();
+                _context.Tags.Add(tag);
+                await _context.SaveChangesAsync();
 
                 var result = new TagsDto
                 {
-                    TagId = tag.Tagid,
+                    TagId = tag.Tagid.ToString(),
                     Status = tag.Status
                 };
 
-                return CreatedAtAction(nameof(GetTag), new { id = tag.Tagid }, result);
+                return CreatedAtAction(
+                    nameof(GetTag),
+                    new { id = result.TagId },
+                    result
+                );
             }
             catch
             {
@@ -111,29 +130,32 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // PUT: api/tags/5
+        // PUT: api/tags/{id}
         [HttpPut("{id}")]
-        [SwaggerOperation (
-            Summary = "Update an existing tag", 
+        [SwaggerOperation(
+            Summary = "Update an existing tag",
             Description = "Updates the details of an existing tag identified by its ID."
-            )]
+        )]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> PutTag(int id, TagsCreateDto dto)
+        public async Task<IActionResult> PutTag(string id, TagsCreateDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Status))
                 return BadRequest("Status is required");
 
+            if (!long.TryParse(id, out var tagId))
+                return BadRequest("Invalid ID");
+
             try
             {
-                var tag = await context.Tags.FindAsync(id);
+                var tag = await _context.Tags.FindAsync(tagId);
                 if (tag == null)
                     return NotFound();
 
                 tag.Status = dto.Status;
-                await context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
                 return NoContent();
             }
@@ -143,25 +165,29 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // DELETE: api/tags/5
+        // DELETE: api/tags/{id}
         [HttpDelete("{id}")]
-        [SwaggerOperation (
-            Summary = "Delete a tag", 
+        [SwaggerOperation(
+            Summary = "Delete a tag",
             Description = "Deletes an existing tag identified by its ID."
-            )]
+        )]
         [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteTag(int id)
+        public async Task<IActionResult> DeleteTag(string id)
         {
+            if (!long.TryParse(id, out var tagId))
+                return BadRequest("Invalid ID");
+
             try
             {
-                var tag = await context.Tags.FindAsync(id);
+                var tag = await _context.Tags.FindAsync(tagId);
                 if (tag == null)
                     return NotFound();
 
-                context.Tags.Remove(tag);
-                await context.SaveChangesAsync();
+                _context.Tags.Remove(tag);
+                await _context.SaveChangesAsync();
 
                 return NoContent();
             }

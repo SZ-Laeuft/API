@@ -9,11 +9,18 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ParticipatesController(SZLDbContext context) : ControllerBase
+    public class ParticipatesController : ControllerBase
     {
+        private readonly SZLDbContext _context;
+
+        public ParticipatesController(SZLDbContext context)
+        {
+            _context = context;
+        }
+
         // GET: api/participates
         [HttpGet]
-        [SwaggerOperation (
+        [SwaggerOperation(
             Summary = "Get all participates",
             Description = "Retrieves a list of all participates in events."
         )]
@@ -23,12 +30,12 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await context.Participates
+                var data = await _context.Participates
                     .Select(p => new ParticipatesDto
                     {
                         ParticipateId = p.Participateid,
                         TeamId = p.Teamid,
-                        TagId = p.Tagid,
+                        TagId = p.Tagid.ToString(),
                         RunnerId = p.Runnerid,
                         EventId = p.Eventid,
                         CategoryId = p.CategoryId
@@ -44,26 +51,26 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // GET: api/participates/5
-        [HttpGet("by-participateId{id}")]
-        [SwaggerOperation (
-            Summary = "Get participate by ID",
-            Description = "Retrieves a specific participate by its unique ID."
+        // GET: api/participates/by-participateId/{id}
+        [HttpGet("by-participateId/{id}")]
+        [SwaggerOperation(
+            Summary = "Get participate by ParticipateId",
+            Description = "Retrieves a specific participate by its unique ParticipateId."
         )]
         [ProducesResponseType(typeof(ParticipatesDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetParticipateParticipateId(int id)
+        public async Task<IActionResult> GetParticipateById(int id)
         {
             try
             {
-                var participate = await context.Participates
+                var participate = await _context.Participates
                     .Where(p => p.Participateid == id)
                     .Select(p => new ParticipatesDto
                     {
                         ParticipateId = p.Participateid,
                         TeamId = p.Teamid,
-                        TagId = p.Tagid,
+                        TagId = p.Tagid.ToString(),
                         RunnerId = p.Runnerid,
                         EventId = p.Eventid,
                         CategoryId = p.CategoryId
@@ -80,37 +87,41 @@ namespace SZL_Backend.Controllers
                 return StatusCode(500);
             }
         }
-        
-        // GET: api/participates/5
+
+        // GET: api/participates/by-tagId/{id}
         [HttpGet("by-tagId/{id}")]
-        [SwaggerOperation (
-            Summary = "Get participate by ID",
-            Description = "Retrieves a specific participate by its unique ID."
+        [SwaggerOperation(
+            Summary = "Get participates by TagId",
+            Description = "Retrieves all participates associated with a specific TagId."
         )]
-        [ProducesResponseType(typeof(ParticipatesDto), 200)]
+        [ProducesResponseType(typeof(IEnumerable<ParticipatesDto>), 200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetParticipatetagId(int id)
+        public async Task<IActionResult> GetParticipatesByTagId(string id)
         {
+            if (!long.TryParse(id, out var tagId))
+                return BadRequest("Invalid TagId");
+
             try
             {
-                var participate = await context.Participates
-                    .Where(p => p.Tagid== id)
+                var participates = await _context.Participates
+                    .Where(p => p.Tagid == tagId)
                     .Select(p => new ParticipatesDto
                     {
                         ParticipateId = p.Participateid,
                         TeamId = p.Teamid,
-                        TagId = p.Tagid,
+                        TagId = p.Tagid.ToString(),
                         RunnerId = p.Runnerid,
                         EventId = p.Eventid,
                         CategoryId = p.CategoryId
                     })
-                    .FirstOrDefaultAsync();
+                    .ToListAsync();
 
-                if (participate == null)
+                if (!participates.Any())
                     return NotFound();
 
-                return Ok(participate);
+                return Ok(participates);
             }
             catch
             {
@@ -120,7 +131,7 @@ namespace SZL_Backend.Controllers
 
         // POST: api/participates
         [HttpPost]
-        [SwaggerOperation (
+        [SwaggerOperation(
             Summary = "Create a new participate",
             Description = "Creates a new participate entry for a team in an event."
         )]
@@ -132,30 +143,36 @@ namespace SZL_Backend.Controllers
             if (dto.TeamId <= 0 || dto.EventId <= 0)
                 return BadRequest("TeamId and EventId must be valid");
 
+            if (string.IsNullOrWhiteSpace(dto.TagId))
+                return BadRequest("TagId is required");
+
+            if (!long.TryParse(dto.TagId, out var tagId))
+                return BadRequest("Invalid TagId");
+
             try
             {
                 var participate = new Participate
                 {
                     Teamid = dto.TeamId,
-                    Tagid = dto.TagId,
+                    Tagid = tagId,
                     Runnerid = dto.RunnerId,
-                    Eventid = dto.EventId,
+                    Eventid = dto.EventId
                 };
 
-                context.Participates.Add(participate);
-                await context.SaveChangesAsync();
+                _context.Participates.Add(participate);
+                await _context.SaveChangesAsync();
 
                 var result = new ParticipatesDto
                 {
                     ParticipateId = participate.Participateid,
                     TeamId = participate.Teamid,
-                    TagId = participate.Tagid,
+                    TagId = participate.Tagid.ToString(),
                     RunnerId = participate.Runnerid,
                     EventId = participate.Eventid,
                     CategoryId = participate.CategoryId
                 };
 
-                return CreatedAtAction(nameof(GetParticipateParticipateId), new { id = participate.Participateid }, result);
+                return CreatedAtAction(nameof(GetParticipateById), new { id = participate.Participateid }, result);
             }
             catch
             {
@@ -163,9 +180,9 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // PUT: api/participates/5
+        // PUT: api/participates/{id}
         [HttpPut("{id}")]
-        [SwaggerOperation (
+        [SwaggerOperation(
             Summary = "Update an existing participate",
             Description = "Updates the details of an existing participate entry."
         )]
@@ -180,16 +197,21 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var participate = await context.Participates.FindAsync(id);
+                var participate = await _context.Participates.FindAsync(id);
                 if (participate == null)
                     return NotFound();
 
                 participate.Teamid = dto.TeamId;
-                participate.Tagid = dto.TagId;
+                if (!string.IsNullOrWhiteSpace(dto.TagId))
+                {
+                    if (!long.TryParse(dto.TagId, out var tagId))
+                        return BadRequest("Invalid TagId");
+                    participate.Tagid = tagId;
+                }
                 participate.Runnerid = dto.RunnerId;
                 participate.Eventid = dto.EventId;
 
-                await context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
                 return NoContent();
             }
@@ -199,9 +221,9 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // DELETE: api/participates/5
+        // DELETE: api/participates/{id}
         [HttpDelete("{id}")]
-        [SwaggerOperation (
+        [SwaggerOperation(
             Summary = "Delete a participate",
             Description = "Deletes an existing participate entry identified by its ID."
         )]
@@ -212,12 +234,12 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var participate = await context.Participates.FindAsync(id);
+                var participate = await _context.Participates.FindAsync(id);
                 if (participate == null)
                     return NotFound();
 
-                context.Participates.Remove(participate);
-                await context.SaveChangesAsync();
+                _context.Participates.Remove(participate);
+                await _context.SaveChangesAsync();
 
                 return NoContent();
             }
