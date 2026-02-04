@@ -2,9 +2,9 @@ namespace SZL_Backend.Dto
 {
     public class CategoriesDto
     {
-        public int CategoryId { get; set; }
+        public int CategoryId { get; init; }
 
-        public string Name { get; set; } = null!;
+        public string Name { get; init; } = null!;
     }
 }
 

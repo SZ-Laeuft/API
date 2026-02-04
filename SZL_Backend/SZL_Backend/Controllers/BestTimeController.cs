@@ -7,22 +7,15 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BestTimeController : ControllerBase
+    public class BestTimeController(SZLDbContext context) : ControllerBase
     {
-        private readonly SZLDbContext _context;
-
-        public BestTimeController(SZLDbContext context)
-        {
-            _context = context;
-        }
-
         // GET: api/besttime
         [HttpGet]
         public async Task<IActionResult> GetBestTimes()
         {
             try
             {
-                var data = await _context.BestTimeViews
+                var data = await context.BestTimeViews
                     .Select(bt => new BestTimeViewDto
                     {
                         ParticipateId = bt.ParticipateId,
@@ -40,13 +33,13 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // GET: api/besttime/1
+        // GET: api/bestTime/1
         [HttpGet("{participateId}")]
         public async Task<IActionResult> GetBestTimeByParticipateId(int participateId)
         {
             try
             {
-                var bestTime = await _context.BestTimeViews
+                var bestTime = await context.BestTimeViews
                     .Where(bt => bt.ParticipateId == participateId)
                     .Select(bt => new BestTimeViewDto
                     {

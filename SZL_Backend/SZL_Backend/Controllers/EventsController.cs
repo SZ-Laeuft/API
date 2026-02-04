@@ -14,9 +14,9 @@ namespace SZL_Backend.Controllers
         // GET: api/events
         [HttpGet]
         [SwaggerOperation(
-            Summary =  "Get all events", 
+            Summary = "Get all events",
             Description = "Gets all events"
-            )]
+        )]
         [ProducesResponseType(typeof(IEnumerable<EventsDto>), 200)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetEvents()
@@ -24,6 +24,7 @@ namespace SZL_Backend.Controllers
             try
             {
                 var data = await context.Events
+                    .OrderBy(e => e.Eventid)
                     .Select(e => new EventsDto
                     {
                         EventId = e.Eventid,
@@ -31,9 +32,8 @@ namespace SZL_Backend.Controllers
                         Place = e.Place,
                         IsActive = e.Isactive,
                         StartTime = e.Starttime,
-                        EndTime = e.Endtime,
+                        EndTime = e.Endtime
                     })
-                    .OrderBy(e => e.EventId)
                     .ToListAsync();
 
                 return Ok(data);
@@ -44,12 +44,12 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // GET: api/events/5
+        // GET: api/events/{id}
         [HttpGet("{id}")]
-        [SwaggerOperation (
-            Summary = "Get event by ID", 
-            Description = "Gets a specific event by its unique ID."
-            )]
+        [SwaggerOperation(
+            Summary = "Get event by ID",
+            Description = "Gets a specific event by its ID"
+        )]
         [ProducesResponseType(typeof(EventsDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -66,8 +66,7 @@ namespace SZL_Backend.Controllers
                         Place = e.Place,
                         IsActive = e.Isactive,
                         StartTime = e.Starttime,
-                        EndTime = e.Endtime,
-                        
+                        EndTime = e.Endtime
                     })
                     .FirstOrDefaultAsync();
 
@@ -84,27 +83,37 @@ namespace SZL_Backend.Controllers
 
         // POST: api/events
         [HttpPost]
-        [SwaggerOperation (
-            Summary = "Create a new event", 
-            Description = "Creates a new event with the provided details."
-            )]
+        [SwaggerOperation(
+            Summary = "Create a new event",
+            Description = "Creates a new event. Only one event can be active at a time."
+        )]
         [ProducesResponseType(typeof(EventsDto), 201)]
-        [ProducesResponseType(400)]
+        [ProducesResponseType(409)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> PostEvent(EventsCreateDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Place))
-                return BadRequest("Name and Place are required");
+            var status = dto.IsActive.ToLowerInvariant();
 
             try
             {
+               
+                if (status == "active")
+                {
+                    var activeEvents = await context.Events
+                        .Where(e => e.Isactive == "active")
+                        .ToListAsync();
+
+                    foreach (var e in activeEvents)
+                        e.Isactive = "inactive";
+                }
+
                 var evt = new Event
                 {
                     Name = dto.Name,
                     Place = dto.Place,
-                    Isactive = dto.IsActive,
+                    Isactive = status,
                     Starttime = dto.StartTime,
-                    Endtime = dto.EndTime,
+                    Endtime = dto.EndTime
                 };
 
                 context.Events.Add(evt);
@@ -117,7 +126,7 @@ namespace SZL_Backend.Controllers
                     Place = evt.Place,
                     IsActive = evt.Isactive,
                     StartTime = evt.Starttime,
-                    EndTime = evt.Endtime,
+                    EndTime = evt.Endtime
                 };
 
                 return CreatedAtAction(nameof(GetEvent), new { id = evt.Eventid }, result);
@@ -128,35 +137,42 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // PUT: api/events/5
+        // PUT: api/events/{id}
         [HttpPut("{id}")]
-        [SwaggerOperation (
-            Summary = "Update an existing event", 
-            Description = "Updates the details of an existing event identified by its ID."
-            )]
+        [SwaggerOperation(
+            Summary = "Update an event",
+            Description = "Updates an event. Setting it to active will deactivate all others."
+        )]
         [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> PutEvent(int id, EventsCreateDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Place))
-                return BadRequest("Name and Place are required");
+            var status = dto.IsActive.ToLowerInvariant();
 
             try
             {
                 var evt = await context.Events.FindAsync(id);
                 if (evt == null)
                     return NotFound();
+                
+                if (status == "active")
+                {
+                    var activeEvents = await context.Events
+                        .Where(e => e.Isactive == "active" && e.Eventid != id)
+                        .ToListAsync();
+
+                    foreach (var e in activeEvents)
+                        e.Isactive = "inactive";
+                }
 
                 evt.Name = dto.Name;
                 evt.Place = dto.Place;
-                evt.Isactive = dto.IsActive;
+                evt.Isactive = status;
                 evt.Starttime = dto.StartTime;
                 evt.Endtime = dto.EndTime;
 
                 await context.SaveChangesAsync();
-
                 return NoContent();
             }
             catch (DbUpdateConcurrencyException)
@@ -165,12 +181,12 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        // DELETE: api/events/5
+        // DELETE: api/events/{id}
         [HttpDelete("{id}")]
-        [SwaggerOperation (
-            Summary = "Delete an event", 
-            Description = "Deletes an existing event identified by its ID."
-            )]
+        [SwaggerOperation(
+            Summary = "Delete an event",
+            Description = "Deletes an event by its ID"
+        )]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]

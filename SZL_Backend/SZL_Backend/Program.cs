@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
+using SZL_Backend;
 using SZL_Backend.Context;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,7 +46,7 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 }
-app.UseCors(builder => builder
+app.UseCors(corsPolicyBuilder => corsPolicyBuilder
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowAnyOrigin()

@@ -42,7 +42,7 @@ namespace SZL_Backend.Controllers
         }
 
         // GET: api/donations/5
-        [HttpGet("by-donation/{donationid}")]
+        [HttpGet("by-donation/{donationId}")]
         [SwaggerOperation(
             Summary = "Get donation by donationId",
             Description = "Retrieves a specific donation by its unique ID."
@@ -76,7 +76,7 @@ namespace SZL_Backend.Controllers
         }
         
         // GET: api/donations/5
-        [HttpGet("by-participate/{participateid}")]
+        [HttpGet("by-participate/{participateId}")]
         [SwaggerOperation(
             Summary = "Get donation by participateId",
             Description = "Retrieves a specific donation by its unique ID."
@@ -84,12 +84,12 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(typeof(DonationsDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> GetDonationParticipateId(int participateid)
+        public async Task<IActionResult> GetDonationParticipateId(int participateId)
         {
             try
             {
                 var donation = await context.Donations
-                    .Where(d => d.Participateid == participateid)
+                    .Where(d => d.Participateid == participateId)
                     .Select(d => new DonationsDto
                     {
                         DonationId = d.Donationid,
@@ -123,7 +123,7 @@ namespace SZL_Backend.Controllers
         {
             if (dto.Amount <= 0)
                 return BadRequest("Amount must be greater than zero");
-            using var transaction = await context.Database.BeginTransactionAsync();
+            await using var transaction = await context.Database.BeginTransactionAsync();
 
             try
             {
@@ -168,7 +168,7 @@ namespace SZL_Backend.Controllers
 
                 return CreatedAtAction(nameof(GetDonationDonationId), new { id = donation.Donationid }, createdResult);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await transaction.RollbackAsync();
                 return StatusCode(500, "An error occurred processing the donation.");

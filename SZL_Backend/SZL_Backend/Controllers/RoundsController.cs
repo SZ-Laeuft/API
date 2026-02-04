@@ -26,12 +26,12 @@ namespace SZL_Backend.Controllers
                 var data = await context.Rounds
                     .Select(r => new RoundsDto
                     {
-                        Roundid = r.Roundid,
-                        Participateid = r.Participateid,
-                        Roundtimestamp = r.Roundtimestamp,
-                        Roundtime = r.Roundtime,
+                        RoundId = r.Roundid,
+                        ParticipateId = r.Participateid,
+                        RoundTimestamp = r.Roundtimestamp,
+                        RoundTime = r.Roundtime,
                     })
-                    .OrderBy(r => r.Roundid)
+                    .OrderBy(r => r.RoundId)
                     .ToListAsync();
 
                 return Ok(data);
@@ -59,10 +59,10 @@ namespace SZL_Backend.Controllers
                     .Where(r => r.Roundid == roundId)
                     .Select(r => new RoundsDto
                     {
-                        Roundid = r.Roundid,
-                        Participateid = r.Participateid,
-                        Roundtimestamp = r.Roundtimestamp,
-                        Roundtime = r.Roundtime,
+                        RoundId = r.Roundid,
+                        ParticipateId = r.Participateid,
+                        RoundTimestamp = r.Roundtimestamp,
+                        RoundTime = r.Roundtime,
                     })
                     .FirstOrDefaultAsync();
 
@@ -94,10 +94,10 @@ namespace SZL_Backend.Controllers
                     .Where(r => r.Participateid == participateId)
                     .Select(r => new RoundsDto
                     {
-                        Roundid = r.Roundid,
-                        Participateid = r.Participateid,
-                        Roundtimestamp = r.Roundtimestamp,
-                        Roundtime = r.Roundtime,
+                        RoundId = r.Roundid,
+                        ParticipateId = r.Participateid,
+                        RoundTimestamp = r.Roundtimestamp,
+                        RoundTime = r.Roundtime,
                     })
                     .FirstOrDefaultAsync();
 
@@ -147,15 +147,15 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> PostRound(RoundsCreateDto dto)
         {
-            if (dto.Participateid <= 0)
+            if (dto.ParticipateId <= 0)
                 return BadRequest("ParticipateId must be greater than zero");
 
             try
             {
                 var round = new Round
                 {
-                    Participateid = dto.Participateid,
-                    Roundtimestamp = dto.Roundtimestamp,
+                    Participateid = dto.ParticipateId,
+                    Roundtimestamp = dto.RoundTimestamp,
                 };
 
                 context.Rounds.Add(round);
@@ -163,10 +163,10 @@ namespace SZL_Backend.Controllers
 
                 var result = new RoundsDto
                 {
-                    Roundid = round.Roundid,
-                    Participateid = round.Participateid,
-                    Roundtimestamp = round.Roundtimestamp,
-                    Roundtime = round.Roundtime,
+                    RoundId = round.Roundid,
+                    ParticipateId = round.Participateid,
+                    RoundTimestamp = round.Roundtimestamp,
+                    RoundTime = round.Roundtime,
                 };
 
                 return CreatedAtAction(nameof(GetRoundRoundId), new { roundId = round.Roundid }, result);
@@ -189,7 +189,7 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> PutRound(int id, RoundsCreateDto dto)
         {
-            if (dto.Participateid <= 0)
+            if (dto.ParticipateId <= 0)
                 return BadRequest("ParticipateId must be greater than zero");
 
             try
@@ -198,8 +198,8 @@ namespace SZL_Backend.Controllers
                 if (round == null)
                     return NotFound();
 
-                round.Participateid = dto.Participateid;
-                round.Roundtimestamp = dto.Roundtimestamp;
+                round.Participateid = dto.ParticipateId;
+                round.Roundtimestamp = dto.RoundTimestamp;
 
                 await context.SaveChangesAsync();
 

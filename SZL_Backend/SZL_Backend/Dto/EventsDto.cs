@@ -1,38 +1,43 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace SZL_Backend.Dto
 {
     public class EventsDto
     {
-        public int EventId { get; set; }
+        public int EventId { get; init; }
 
-        public string? Name { get; set; }
+        public string? Name { get; init; }
 
-        public string? Place { get; set; }
+        public string? Place { get; init; }
 
-        public string? IsActive { get; set; }
+        public string? IsActive { get; init; }
 
-        public DateTime? StartTime { get; set; }
+        public DateTime? StartTime { get; init; }
 
-        public DateTime? EndTime { get; set; }
+        public DateTime? EndTime { get; init; }
 
-        public int? Categoryid { get; set; }
+        public int? CategoryId { get; init; }
     }
 }
 
 namespace SZL_Backend.Dto
 {
-    public class EventsCreateDto
+    public class EventsCreateDto(string? name, string? place, DateTime? startTime, DateTime? endTime)
     {
         public int EventId { get; set; }
 
-        public string? Name { get; set; }
+        public string? Name { get; } = name;
 
-        public string? Place { get; set; }
+        public string? Place { get; } = place;
 
-        public string? IsActive { get; set; }
+        [Required]
+        [RegularExpression("^(true|false)$",
+            ErrorMessage = "IsActive must be 'true' or 'false'")]
+        public string IsActive { get; set; } = null!;
 
-        public DateTime? StartTime { get; set; }
+        public DateTime? StartTime { get; } = startTime;
 
-        public DateTime? EndTime { get; set; }
+        public DateTime? EndTime { get; } = endTime;
 
         public int? CategoryId { get; set; }
     }

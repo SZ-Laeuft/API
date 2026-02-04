@@ -2,17 +2,16 @@ namespace SZL_Backend.Dto
 {
     public class TeamsDto
     {
-        public int TeamId { get; set; }
+        public int TeamId { get; init; }
 
-        public string? Name { get; set; }
+        public string? Name { get; init; }
     }
 }
 
 namespace SZL_Backend.Dto
 {
-    public class TeamsCreateDto
+    public class TeamsCreateDto(string? name)
     {
-    
-        public string? Name { get; set; }
+        public string? Name { get; } = name;
     }
 }

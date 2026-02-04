@@ -9,15 +9,8 @@ namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ParticipatesController : ControllerBase
+    public class ParticipatesController(SZLDbContext context) : ControllerBase
     {
-        private readonly SZLDbContext _context;
-
-        public ParticipatesController(SZLDbContext context)
-        {
-            _context = context;
-        }
-
         // GET: api/participates
         [HttpGet]
         [SwaggerOperation(
@@ -30,7 +23,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await _context.Participates
+                var data = await context.Participates
                     .Select(p => new ParticipatesDto
                     {
                         ParticipateId = p.Participateid,
@@ -64,7 +57,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var participate = await _context.Participates
+                var participate = await context.Participates
                     .Where(p => p.Participateid == id)
                     .Select(p => new ParticipatesDto
                     {
@@ -105,7 +98,7 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var participates = await _context.Participates
+                var participates = await context.Participates
                     .Where(p => p.Tagid == tagId)
                     .Select(p => new ParticipatesDto
                     {
@@ -159,8 +152,8 @@ namespace SZL_Backend.Controllers
                     Eventid = dto.EventId
                 };
 
-                _context.Participates.Add(participate);
-                await _context.SaveChangesAsync();
+                context.Participates.Add(participate);
+                await context.SaveChangesAsync();
 
                 var result = new ParticipatesDto
                 {
@@ -197,7 +190,7 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var participate = await _context.Participates.FindAsync(id);
+                var participate = await context.Participates.FindAsync(id);
                 if (participate == null)
                     return NotFound();
 
@@ -211,7 +204,7 @@ namespace SZL_Backend.Controllers
                 participate.Runnerid = dto.RunnerId;
                 participate.Eventid = dto.EventId;
 
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }
@@ -234,12 +227,12 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var participate = await _context.Participates.FindAsync(id);
+                var participate = await context.Participates.FindAsync(id);
                 if (participate == null)
                     return NotFound();
 
-                _context.Participates.Remove(participate);
-                await _context.SaveChangesAsync();
+                context.Participates.Remove(participate);
+                await context.SaveChangesAsync();
 
                 return NoContent();
             }
