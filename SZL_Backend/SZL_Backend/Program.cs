@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using QuestPDF.Infrastructure;
 using SZL_Backend;
 using SZL_Backend.Context;
 
@@ -35,6 +36,8 @@ if (string.IsNullOrWhiteSpace(connectionString))
 builder.Services.AddDbContext<SZLDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+QuestPDF.Settings.License = LicenseType.Community;
+QuestPDF.Settings.EnableDebugging = true;
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
