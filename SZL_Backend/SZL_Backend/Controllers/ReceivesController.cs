@@ -191,6 +191,54 @@ namespace SZL_Backend.Controllers
                 return StatusCode(500);
             }
         }
+        
+        // PUT: api/receives/{giftId}/{participateId}
+        [HttpPut("{giftId}/{participateId}")]
+        [SwaggerOperation(
+            Summary = "Update receive record by GiftId and ParticipateId",
+            Description = "Updates a specific receive record identified by GiftId and ParticipateId."
+        )]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(409)]
+        [ProducesResponseType(500)]
+        public IActionResult Update(int giftId, int participateId, [FromBody] ReceivesDto dto)
+        {
+            if (giftId <= 0 || participateId <= 0)
+                return BadRequest("GiftId and ParticipateId must be greater than zero.");
+
+            if (dto.GiftId <= 0 || dto.ParticipateId <= 0)
+                return BadRequest("Dto GiftId and ParticipateId must be greater than zero.");
+
+            try
+            {
+                var receive = Receives.FirstOrDefault(r =>
+                    r.GiftId == giftId && r.ParticipateId == participateId);
+
+                if (receive == null)
+                    return NotFound();
+                
+                var duplicateExists = Receives.Any(r =>
+                    r != receive &&
+                    r.GiftId == dto.GiftId &&
+                    r.ParticipateId == dto.ParticipateId);
+
+                if (duplicateExists)
+                    return Conflict("A record with the new GiftId and ParticipateId already exists.");
+
+                receive.GiftId = dto.GiftId;
+                receive.ParticipateId = dto.ParticipateId;
+                receive.IsCollected = dto.IsCollected;
+
+                return NoContent();
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        
         // DELETE: api/receives/gift/{giftId}
         [HttpDelete("gift/{giftId}")]
         [SwaggerOperation(
