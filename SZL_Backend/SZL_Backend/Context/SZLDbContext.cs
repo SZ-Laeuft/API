@@ -28,6 +28,8 @@ public partial class SZLDbContext : DbContext
 
     public virtual DbSet<Participate> Participates { get; set; }
 
+    public virtual DbSet<Receive> Receives { get; set; }
+
     public virtual DbSet<Round> Rounds { get; set; }
 
     public virtual DbSet<Runner> Runners { get; set; }
@@ -35,6 +37,11 @@ public partial class SZLDbContext : DbContext
     public virtual DbSet<Tag> Tags { get; set; }
 
     public virtual DbSet<Team> Teams { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseNpgsql("Host=100.94.128.1;Port=5432;Database=szl;Username=admin;Password=Szl-20010901");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BestTimeView>(entity =>
@@ -105,25 +112,6 @@ public partial class SZLDbContext : DbContext
                 .HasMaxLength(30)
                 .HasColumnName("name");
             entity.Property(e => e.Requirement).HasColumnName("requirement");
-
-            entity.HasMany(d => d.Participates).WithMany(p => p.Gifts)
-                .UsingEntity<Dictionary<string, object>>(
-                    "Receife",
-                    r => r.HasOne<Participate>().WithMany()
-                        .HasForeignKey("ParticipateId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("fk_participateid_receives"),
-                    l => l.HasOne<Gift>().WithMany()
-                        .HasForeignKey("Giftid")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("fk_giftid_receives"),
-                    j =>
-                    {
-                        j.HasKey("Giftid", "ParticipateId").HasName("receives_pkey");
-                        j.ToTable("receives");
-                        j.IndexerProperty<int>("Giftid").HasColumnName("giftid");
-                        j.IndexerProperty<int>("ParticipateId").HasColumnName("participateid");
-                    });
         });
 
         modelBuilder.Entity<Participate>(entity =>
@@ -158,6 +146,30 @@ public partial class SZLDbContext : DbContext
             entity.HasOne(d => d.Team).WithMany(p => p.Participates)
                 .HasForeignKey(d => d.Teamid)
                 .HasConstraintName("fk_teamid_participate");
+        });
+
+        modelBuilder.Entity<Receive>(entity =>
+        {
+            entity.HasKey(e => new { e.Giftid, e.Participateid }).HasName("receives_pkey");
+
+            entity.ToTable("receives");
+
+            entity.Property(e => e.Giftid).HasColumnName("giftid");
+            entity.Property(e => e.Participateid).HasColumnName("participateid");
+            entity.Property(e => e.Iscollected)
+                .HasMaxLength(255)
+                .HasDefaultValueSql("false")
+                .HasColumnName("iscollected");
+
+            entity.HasOne(d => d.Gift).WithMany(p => p.Receives)
+                .HasForeignKey(d => d.Giftid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_giftid_receives");
+
+            entity.HasOne(d => d.Participate).WithMany(p => p.Receives)
+                .HasForeignKey(d => d.Participateid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_participateid_receives");
         });
 
         modelBuilder.Entity<Round>(entity =>

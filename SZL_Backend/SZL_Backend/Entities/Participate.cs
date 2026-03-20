@@ -23,6 +23,8 @@ public partial class Participate
 
     public virtual Event? Event { get; set; }
 
+    public virtual ICollection<Receive> Receives { get; set; } = new List<Receive>();
+
     public virtual ICollection<Round> Rounds { get; set; } = new List<Round>();
 
     public virtual Runner? Runner { get; set; }
@@ -30,6 +32,4 @@ public partial class Participate
     public virtual Tag? Tag { get; set; }
 
     public virtual Team? Team { get; set; }
-
-    public virtual ICollection<Gift> Gifts { get; set; } = new List<Gift>();
 }
