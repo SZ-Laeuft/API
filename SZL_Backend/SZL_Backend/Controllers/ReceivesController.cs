@@ -150,6 +150,7 @@ namespace SZL_Backend.Controllers
 
                 receive.GiftId = dto.GiftId;
                 receive.ParticipateId = dto.ParticipateId;
+                receive.IsCollected =  dto.IsCollected;
 
                 return NoContent();
             }
@@ -181,6 +182,7 @@ namespace SZL_Backend.Controllers
 
                 receive.GiftId = dto.GiftId;
                 receive.ParticipateId = dto.ParticipateId;
+                receive.IsCollected =  dto.IsCollected;
 
                 return NoContent();
             }
