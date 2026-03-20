@@ -9,7 +9,7 @@ public class ReceivesDto
     public int ParticipateId { get; set; }
     
     [Microsoft.Build.Framework.Required]
-    [RegularExpression("^(ture|false)$",
+    [RegularExpression("^(true|false)$",
         ErrorMessage = "Status must be 'true' or 'false'")]
     public string IsCollected { get; set; } = null!;
 }
