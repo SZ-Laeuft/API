@@ -2,14 +2,15 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using SZL_Backend.Dto;
+using SZL_Backend.Entities;
 
 namespace SZL_Backend;
 
 public class CertificatePdfRenderer
 {
-    public byte[] Generate(List<CertificateDataDto> certificates)
+    public byte[] Generate(List<CertificatePdf> certificates)
     {
-        certificates ??= new List<CertificateDataDto>();
+        certificates ??= new List<CertificatePdf>();
 
         return Document.Create(document =>
         {
@@ -18,16 +19,13 @@ public class CertificatePdfRenderer
                 page.Size(PageSizes.A4);
                 page.Margin(2, Unit.Centimetre);
                 page.PageColor(Colors.White);
-                page.DefaultTextStyle(x => x.FontSize(14));
+                page.DefaultTextStyle(x => x.FontFamily("Consolas").FontSize(14));
 
                 page.Footer()
                     .AlignCenter()
                     .Text(text =>
                     {
-                        text.Span("Seite ");
-                        text.CurrentPageNumber();
-                        text.Span(" / ");
-                        text.TotalPages();
+                        text.Span("Gesponsort von: ");
                     });
 
                 page.Content()
@@ -57,56 +55,62 @@ public class CertificatePdfRenderer
         }).GeneratePdf();
     }
 
-    private static void ComposeCertificate(IContainer container, CertificateDataDto item)
+    private static void ComposeCertificate(IContainer container, CertificatePdf item)
     {
         var fullName = $"{item.FirstName} {item.LastName}".Trim();
 
         container
-            .Border(1)
-            .Padding(30)
+            .AlignCenter()
             .Column(column =>
             {
-                column.Spacing(12);
-
                 column.Item()
+                    .PaddingTop(-50)
+                    .Width(450)
+                    .Image("Assets/Certificates/Logos/Logo.png");
+                
+                column.Item()
+                    .PaddingTop(-20)
                     .AlignCenter()
-                    .Text("TEST-URKUNDE")
+                    .Text(string.IsNullOrWhiteSpace(fullName) ? "Unbekannter Teilnehmer" : fullName)
                     .FontSize(28)
                     .Bold();
-
+                
+                column.Item()
+                    .PaddingTop(10)
+                    .AlignCenter()
+                    .Text("belegte beim")
+                    .FontSize(22);
+                
+                column.Item()
+                    .PaddingTop(10)
+                    .AlignCenter()
+                    .Text("Charitylauf")
+                    .FontSize(22);
+                
                 column.Item()
                     .AlignCenter()
                     .Text(item.EventName)
-                    .FontSize(18);
-
-                column.Item()
-                    .PaddingTop(20)
-                    .AlignCenter()
-                    .Text("Verliehen an")
-                    .FontSize(14);
-
-                column.Item()
-                    .AlignCenter()
-                    .Text(string.IsNullOrWhiteSpace(fullName) ? "Unbekannter Teilnehmer" : fullName)
-                    .FontSize(24)
+                    .FontSize(28)
                     .Bold();
-
+                
                 column.Item()
                     .PaddingTop(15)
                     .AlignCenter()
-                    .Text($"Runden: {item.RoundCount}")
-                    .FontSize(16);
+                    .Text($"den {item.Place}. Platz")
+                    .FontSize(28);
 
                 column.Item()
+                    .PaddingTop(10)
                     .AlignCenter()
-                    .Text("Platzierung: TEST")
-                    .FontSize(16);
+                    .Text("mit insgesamt")
+                    .FontSize(22);
 
                 column.Item()
-                    .PaddingTop(30)
+                    .PaddingTop(5)
                     .AlignCenter()
-                    .Text("Nur Testlayout - Vorlage folgt später")
-                    .FontSize(12);
+                    .Text($"{item.RoundCount} Runden")
+                    .FontSize(28)
+                    .Bold();
             });
     }
 }

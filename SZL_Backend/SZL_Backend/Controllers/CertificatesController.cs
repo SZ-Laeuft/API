@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using SZL_Backend.Context;
 using SZL_Backend.Dto;
+using SZL_Backend.Entities;
 
 namespace SZL_Backend.Controllers
 {
@@ -48,9 +49,21 @@ namespace SZL_Backend.Controllers
 
                 if (certificateData.Count == 0)
                     return NotFound("No participants found for this event");
+                
+                var rankedCertificates = certificateData
+                    .Select((item, index) => new CertificatePdf
+                    {
+                        ParticipateId = item.ParticipateId,
+                        EventName = item.EventName,
+                        FirstName = item.FirstName,
+                        LastName = item.LastName,
+                        RoundCount = item.RoundCount,
+                        Place = index + 1
+                    })
+                    .ToList();
 
                 var renderer = new CertificatePdfRenderer();
-                var pdfBytes = renderer.Generate(certificateData);
+                var pdfBytes = renderer.Generate(rankedCertificates);
 
                 return File(pdfBytes, "application/pdf");
             }
