@@ -11,16 +11,14 @@ namespace SZL_Backend.Controllers
     [ApiController]
     public class CertificatesController(SZLDbContext context) : ControllerBase
     {
-        // GET: api/certificates/5/pdf
         [HttpGet("{eventId:int}/pdf")]
         [SwaggerOperation(
             Summary = "Generate certificates PDF for an event",
             Description = "Generates one combined PDF containing all certificates for the specified event."
         )]
-        [Produces("application/pdf")]
-        [ProducesResponseType(typeof(FileContentResult), 200)]
-        [ProducesResponseType(404)]
-        [ProducesResponseType(500)]
+        [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCertificatesPdf(int eventId)
         {
             try
@@ -29,7 +27,11 @@ namespace SZL_Backend.Controllers
                     .AnyAsync(e => e.Eventid == eventId);
 
                 if (!eventExists)
-                    return NotFound("Event not found");
+                    return NotFound(new
+                    {
+                        error = "EventNotFound",
+                        message = $"Event with id {eventId} was not found."
+                    });
 
                 var certificateData = await context.Participates
                     .AsNoTracking()
@@ -48,8 +50,12 @@ namespace SZL_Backend.Controllers
                     .ToListAsync();
 
                 if (certificateData.Count == 0)
-                    return NotFound("No participants found for this event");
-                
+                    return NotFound(new
+                    {
+                        error = "ParticipantsNotFound",
+                        message = $"No participants were found for event {eventId}."
+                    });
+
                 var rankedCertificates = certificateData
                     .Select((item, index) => new CertificatePdf
                     {
@@ -65,11 +71,27 @@ namespace SZL_Backend.Controllers
                 var renderer = new CertificatePdfRenderer();
                 var pdfBytes = renderer.Generate(rankedCertificates);
 
-                return File(pdfBytes, "application/pdf");
+                if (pdfBytes == null || pdfBytes.Length == 0)
+                    return StatusCode(StatusCodes.Status500InternalServerError, new
+                    {
+                        error = "PdfGenerationFailed",
+                        message = "PDF could not be generated."
+                    });
+
+                return File(
+                    pdfBytes,
+                    "application/pdf",
+                    $"Urkunden_Event_{eventId}.pdf"
+                );
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    error = "PdfGenerationFailed",
+                    message = "An unexpected error occurred while generating the PDF.",
+                    details = ex.Message
+                });
             }
         }
     }
