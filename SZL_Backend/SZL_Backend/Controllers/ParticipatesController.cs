@@ -57,7 +57,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var participate = await context.Participates
+                var participates = await context.Participates
                     .Where(p => p.Participateid == id)
                     .Select(p => new ParticipatesDto
                     {
@@ -70,10 +70,46 @@ namespace SZL_Backend.Controllers
                     })
                     .FirstOrDefaultAsync();
 
-                if (participate == null)
+                if (participates == null)
                     return NotFound();
 
-                return Ok(participate);
+                return Ok(participates);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+     
+        
+        // GET: api/participates/amount/by-teamId/{id}
+        [HttpGet("amount/by-teamId/{id}")]
+        [SwaggerOperation(
+            Summary = "Get participate amount by TeamId",
+            Description = "Retrieves a amount of participates by their TeamId."
+        )]
+        [ProducesResponseType(typeof(ParticipatesDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetParticipateAmountByTeamId(int id)
+        {
+            try
+            {
+                var amount = await context.Participates
+                    .Where(p => p.Teamid == id)
+                    .Select(p => new ParticipatesDto
+                    {
+                        ParticipateId = p.Participateid,
+                        TeamId = p.Teamid,
+                        TagId = p.Tagid.ToString(),
+                        RunnerId = p.Runnerid,
+                        EventId = p.Eventid,
+                        CategoryId = p.CategoryId
+                    })
+                    .CountAsync();
+                
+
+                return Ok(amount);
             }
             catch
             {
