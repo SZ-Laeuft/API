@@ -13,5 +13,7 @@ public partial class Round
 
     public double? Roundtime { get; set; }
 
+    public string? IsValid { get; set; }
+
     public virtual Participate? Participate { get; set; }
 }

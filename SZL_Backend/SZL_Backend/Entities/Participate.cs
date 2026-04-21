@@ -15,7 +15,7 @@ public partial class Participate
 
     public long? Tagid { get; set; }
 
-    public int? CategoryId { get; set; }
+    public int? Categoryid { get; set; }
 
     public string? EarlyStarter { get; set; }
 
@@ -25,7 +25,7 @@ public partial class Participate
 
     public virtual Event? Event { get; set; }
 
-    public virtual ICollection<Receive> Receives { get; set; } = new List<Receive>();
+    public virtual IEnumerable<Receive>? Receives { get; set; } = new List<Receive>();
 
     public virtual ICollection<Round> Rounds { get; set; } = new List<Round>();
 

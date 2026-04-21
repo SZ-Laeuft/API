@@ -37,7 +37,8 @@ public partial class SZLDbContext : DbContext
     public virtual DbSet<Tag> Tags { get; set; }
 
     public virtual DbSet<Team> Teams { get; set; }
-    
+
+  
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BestTimeView>(entity =>
@@ -117,7 +118,7 @@ public partial class SZLDbContext : DbContext
             entity.ToTable("participate");
 
             entity.Property(e => e.Participateid).HasColumnName("participateid");
-            entity.Property(e => e.CategoryId).HasColumnName("categoryId");
+            entity.Property(e => e.Categoryid).HasColumnName("categoryid");
             entity.Property(e => e.EarlyStarter)
                 .HasMaxLength(255)
                 .HasColumnName("early_starter");
@@ -127,7 +128,7 @@ public partial class SZLDbContext : DbContext
             entity.Property(e => e.Teamid).HasColumnName("teamid");
 
             entity.HasOne(d => d.Category).WithMany(p => p.Participates)
-                .HasForeignKey(d => d.CategoryId)
+                .HasForeignKey(d => d.Categoryid)
                 .HasConstraintName("fk_categoryid_participate");
 
             entity.HasOne(d => d.Event).WithMany(p => p.Participates)
@@ -178,6 +179,10 @@ public partial class SZLDbContext : DbContext
             entity.ToTable("rounds");
 
             entity.Property(e => e.Roundid).HasColumnName("roundid");
+            entity.Property(e => e.IsValid)
+                .HasMaxLength(255)
+                .HasDefaultValueSql("true")
+                .HasColumnName("is_valid");
             entity.Property(e => e.Participateid).HasColumnName("participateid");
             entity.Property(e => e.Roundtime).HasColumnName("roundtime");
             entity.Property(e => e.Roundtimestamp).HasColumnName("roundtimestamp");
@@ -195,6 +200,9 @@ public partial class SZLDbContext : DbContext
 
             entity.Property(e => e.Runnerid).HasColumnName("runnerid");
             entity.Property(e => e.Birthdate).HasColumnName("birthdate");
+            entity.Property(e => e.Class)
+                .HasMaxLength(255)
+                .HasColumnName("class");
             entity.Property(e => e.Firstname)
                 .HasMaxLength(30)
                 .HasColumnName("firstname");

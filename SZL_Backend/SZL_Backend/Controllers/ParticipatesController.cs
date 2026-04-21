@@ -31,7 +31,7 @@ namespace SZL_Backend.Controllers
                         TagId = p.Tagid.ToString(),
                         RunnerId = p.Runnerid,
                         EventId = p.Eventid,
-                        CategoryId = p.CategoryId
+                        CategoryId = p.Categoryid
                     })
                     .OrderBy(p => p.ParticipateId)
                     .ToListAsync();
@@ -66,7 +66,7 @@ namespace SZL_Backend.Controllers
                         TagId = p.Tagid.ToString(),
                         RunnerId = p.Runnerid,
                         EventId = p.Eventid,
-                        CategoryId = p.CategoryId
+                        CategoryId = p.Categoryid
                     })
                     .FirstOrDefaultAsync();
 
@@ -104,7 +104,7 @@ namespace SZL_Backend.Controllers
                         TagId = p.Tagid.ToString(),
                         RunnerId = p.Runnerid,
                         EventId = p.Eventid,
-                        CategoryId = p.CategoryId
+                        CategoryId = p.Categoryid
                     })
                     .CountAsync();
                 
@@ -143,7 +143,7 @@ namespace SZL_Backend.Controllers
                         TagId = p.Tagid.ToString(),
                         RunnerId = p.Runnerid,
                         EventId = p.Eventid,
-                        CategoryId = p.CategoryId
+                        CategoryId = p.Categoryid
                     })
                     .ToListAsync();
 
@@ -198,7 +198,7 @@ namespace SZL_Backend.Controllers
                     TagId = participate.Tagid.ToString(),
                     RunnerId = participate.Runnerid,
                     EventId = participate.Eventid,
-                    CategoryId = participate.CategoryId
+                    CategoryId = participate.Categoryid
                 };
 
                 return CreatedAtAction(nameof(GetParticipateById), new { id = participate.Participateid }, result);

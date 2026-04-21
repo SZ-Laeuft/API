@@ -27,7 +27,12 @@ namespace SZL_Backend.Controllers
             {
                 var receive = await context.Receives
                     .Where(r => r.Giftid == giftId && r.Participateid == participateId)
-                    .Select(ToDto())
+                    .Select(r => new ReceivesDto
+                    {
+                        GiftId = r.Giftid,
+                        ParticipateId = r.Participateid,
+                        IsCollected = r.Iscollected
+                    })
                     .FirstOrDefaultAsync();
 
                 return receive is null ? NotFound() : Ok(receive);
@@ -50,7 +55,12 @@ namespace SZL_Backend.Controllers
             try
             {
                 var data = await context.Receives
-                    .Select(ToDto())
+                    .Select(r => new ReceivesDto
+                    {
+                        GiftId = r.Giftid,
+                        ParticipateId = r.Participateid,
+                        IsCollected = r.Iscollected
+                    })
                     .OrderBy(r => r.GiftId)
                     .ThenBy(r => r.ParticipateId)
                     .ToListAsync();
@@ -76,7 +86,12 @@ namespace SZL_Backend.Controllers
             {
                 var data = await context.Receives
                     .Where(r => r.Giftid == giftId)
-                    .Select(ToDto())
+                    .Select(r => new ReceivesDto
+                    {
+                        GiftId = r.Giftid,
+                        ParticipateId = r.Participateid,
+                        IsCollected = r.Iscollected
+                    })
                     .OrderBy(r => r.ParticipateId)
                     .ToListAsync();
 
@@ -101,7 +116,12 @@ namespace SZL_Backend.Controllers
             {
                 var data = await context.Receives
                     .Where(r => r.Participateid == participateId)
-                    .Select(ToDto())
+                    .Select(r => new ReceivesDto
+                    {
+                        GiftId = r.Giftid,
+                        ParticipateId = r.Participateid,
+                        IsCollected = r.Iscollected
+                    })
                     .OrderBy(r => r.GiftId)
                     .ToListAsync();
 
@@ -222,16 +242,6 @@ namespace SZL_Backend.Controllers
             {
                 return StatusCode(500);
             }
-        }
-
-        private static Expression<Func<Receive, ReceivesDto>> ToDto()
-        {
-            return r => new ReceivesDto
-            {
-                GiftId = r.Giftid,
-                ParticipateId = r.Participateid,
-                IsCollected = r.Iscollected
-            };
         }
     }
 }
