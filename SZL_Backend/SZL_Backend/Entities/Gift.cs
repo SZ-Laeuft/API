@@ -11,5 +11,5 @@ public partial class Gift
 
     public int? Requirement { get; set; }
 
-    public virtual ICollection<Receife> Receives { get; set; } = new List<Receife>();
+    public virtual ICollection<Receive> Receives { get; set; } = new List<Receive>();
 }

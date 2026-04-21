@@ -28,7 +28,7 @@ public partial class SZLDbContext : DbContext
 
     public virtual DbSet<Participate> Participates { get; set; }
 
-    public virtual DbSet<Receife> Receives { get; set; }
+    public virtual DbSet<Receive> Receives { get; set; }
 
     public virtual DbSet<Round> Rounds { get; set; }
 
@@ -147,7 +147,7 @@ public partial class SZLDbContext : DbContext
                 .HasConstraintName("fk_teamid_participate");
         });
 
-        modelBuilder.Entity<Receife>(entity =>
+        modelBuilder.Entity<Receive>(entity =>
         {
             entity.HasKey(e => new { e.Giftid, e.Participateid }).HasName("receives_pkey");
 
