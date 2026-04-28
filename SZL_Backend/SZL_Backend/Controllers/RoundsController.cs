@@ -30,6 +30,7 @@ namespace SZL_Backend.Controllers
                         ParticipateId = r.Participateid,
                         RoundTimestamp = r.Roundtimestamp,
                         RoundTime = r.Roundtime,
+                        IsValid = r.IsValid,
                     })
                     .OrderBy(r => r.RoundId)
                     .ToListAsync();
@@ -63,6 +64,7 @@ namespace SZL_Backend.Controllers
                         ParticipateId = r.Participateid,
                         RoundTimestamp = r.Roundtimestamp,
                         RoundTime = r.Roundtime,
+                        IsValid = r.IsValid,
                     })
                     .FirstOrDefaultAsync();
 
@@ -98,6 +100,7 @@ namespace SZL_Backend.Controllers
                         ParticipateId = r.Participateid,
                         RoundTimestamp = r.Roundtimestamp,
                         RoundTime = r.Roundtime,
+                        IsValid = r.IsValid,
                     })
                     .FirstOrDefaultAsync();
 
@@ -187,7 +190,7 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> PutRound(int id, RoundsCreateDto dto)
+        public async Task<IActionResult> PutRound(int id, RoundsUpdateDto dto)
         {
             if (dto.ParticipateId <= 0)
                 return BadRequest("ParticipateId must be greater than zero");
@@ -200,6 +203,7 @@ namespace SZL_Backend.Controllers
 
                 round.Participateid = dto.ParticipateId;
                 round.Roundtimestamp = dto.RoundTimestamp;
+                round.IsValid = dto.IsValid;
 
                 await context.SaveChangesAsync();
 
