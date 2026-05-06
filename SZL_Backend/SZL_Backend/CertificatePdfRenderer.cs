@@ -57,6 +57,7 @@ public class CertificatePdfRenderer
 
     private static void ComposeCertificate(IContainer container, CertificatePdf item)
     {
+        var logoPath = Path.Combine(AppContext.BaseDirectory, "Assets", "Certificates", "Logos", "Logo.png");
         var fullName = $"{item.FirstName} {item.LastName}".Trim();
 
         container
@@ -66,7 +67,7 @@ public class CertificatePdfRenderer
                 column.Item()
                     .PaddingTop(-50)
                     .Width(450)
-                    .Image("Assets/Certificates/Logos/Logo.png");
+                    .Image(logoPath);
                 
                 column.Item()
                     .PaddingTop(-20)

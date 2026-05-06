@@ -37,6 +37,12 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Assets\Certificates\Logos\Logo.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 
 
 </Project>
