@@ -17,7 +17,7 @@ Das Projekt basiert auf ASP.NET Core, Entity Framework Core und PostgreSQL. Fuer
 - [Wichtige Endpunkte](#wichtige-endpunkte)
 - [Datenmodell](#datenmodell)
 - [Sicherheit und sensible Daten](#sicherheit-und-sensible-daten)
-- [Nuetzliche Befehle](#nuetzliche-befehle)
+- [Nützliche Befehle](#nützliche-befehle)
 
 ## Features
 
