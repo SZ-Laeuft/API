@@ -285,7 +285,7 @@ Bitte beachte:
 - Datenbank-Dumps, Zertifikate, private Schluessel und lokale Publish-Artefakte nicht committen.
 - Vor Pull Requests pruefen, ob versehentlich sensible Daten geaendert oder hinzugefuegt wurden.
 
-## Nuetzliche Befehle
+## Nützliche Befehle
 
 Build ausfuehren:
 
