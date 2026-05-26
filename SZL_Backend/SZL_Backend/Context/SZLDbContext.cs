@@ -200,9 +200,6 @@ public partial class SZLDbContext : DbContext
 
             entity.Property(e => e.Runnerid).HasColumnName("runnerid");
             entity.Property(e => e.Birthdate).HasColumnName("birthdate");
-            entity.Property(e => e.Class)
-                .HasMaxLength(255)
-                .HasColumnName("class");
             entity.Property(e => e.Firstname)
                 .HasMaxLength(30)
                 .HasColumnName("firstname");
