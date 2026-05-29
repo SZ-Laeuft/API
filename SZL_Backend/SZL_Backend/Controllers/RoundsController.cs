@@ -94,6 +94,7 @@ namespace SZL_Backend.Controllers
             {
                 var round = await context.Rounds
                     .Where(r => r.Participateid == participateId)
+                    .OrderByDescending(r => r.Roundid)
                     .Select(r => new RoundsDto
                     {
                         RoundId = r.Roundid,
@@ -131,7 +132,7 @@ namespace SZL_Backend.Controllers
                 var rounds = await context.Rounds
                     .Where(r => r.Participateid == participateId)
                     .CountAsync();
-                return Ok(rounds);
+                return Ok(rounds-1);
             }
             catch
             {
