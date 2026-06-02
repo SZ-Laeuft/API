@@ -117,7 +117,8 @@ namespace SZL_Backend.Controllers
         {
             var query = context.Rounds
                 .Where(round =>
-                    round.IsValid == "true" &&
+                    round.IsValid != null &&
+                    EF.Functions.ILike(round.IsValid.Trim(), "true") &&
                     round.Roundtimestamp != null
                 )
                 .Join(
@@ -168,9 +169,11 @@ namespace SZL_Backend.Controllers
                     Lastname = group.Key.Lastname,
                     Gender = group.Key.Gender,
                     RoundCount = group.Count(),
+                    TotalRoundTime = group.Sum(x => x.round.Roundtime ?? 0),
                     ReachedAt = group.Max(x => x.round.Roundtimestamp)
                 })
                 .OrderByDescending(entry => entry.RoundCount)
+                .ThenBy(entry => entry.TotalRoundTime)
                 .ThenBy(entry => entry.ReachedAt)
                 .ThenBy(entry => entry.ParticipateId)
                 .Take(5)

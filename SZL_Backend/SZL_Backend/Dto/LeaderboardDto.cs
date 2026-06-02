@@ -34,6 +34,7 @@ public class LeaderboardRoundsEntryDto
     public string? Gender { get; set; }
 
     public int RoundCount { get; set; }      
+    public double TotalRoundTime { get; set; }
     public DateTime? ReachedAt { get; set; } 
 }
 
