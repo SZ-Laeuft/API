@@ -171,8 +171,11 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> PostParticipate(ParticipatesCreateDto dto)
         {
-            if (dto.TeamId is null or <= 0 || dto.EventId is null or <= 0)
-                return BadRequest("TeamId and EventId must be valid");
+            if (dto.EventId is null or <= 0)
+                return BadRequest("EventId must be valid");
+
+            if (dto.TeamId is <= 0)
+                return BadRequest("TeamId must be greater than zero");
 
             if (dto.RunnerId is <= 0)
                 return BadRequest("RunnerId must be greater than zero");
@@ -185,9 +188,12 @@ namespace SZL_Backend.Controllers
 
             try
             {
-                var teamExists = await context.Teams.AnyAsync(t => t.Teamid == dto.TeamId);
-                if (!teamExists)
-                    return NotFound("TeamId does not exist");
+                if (dto.TeamId is not null)
+                {
+                    var teamExists = await context.Teams.AnyAsync(t => t.Teamid == dto.TeamId);
+                    if (!teamExists)
+                        return NotFound("TeamId does not exist");
+                }
 
                 var eventExists = await context.Events.AnyAsync(e => e.Eventid == dto.EventId);
                 if (!eventExists)
@@ -245,14 +251,24 @@ namespace SZL_Backend.Controllers
         [ProducesResponseType(500)]
         public async Task<IActionResult> PutParticipate(int id, ParticipatesCreateDto dto)
         {
-            if (dto.TeamId <= 0 || dto.EventId <= 0)
-                return BadRequest("TeamId and EventId must be valid");
+            if (dto.EventId is null or <= 0)
+                return BadRequest("EventId must be valid");
+
+            if (dto.TeamId is <= 0)
+                return BadRequest("TeamId must be greater than zero");
 
             try
             {
                 var participate = await context.Participates.FindAsync(id);
                 if (participate == null)
                     return NotFound();
+
+                if (dto.TeamId is not null)
+                {
+                    var teamExists = await context.Teams.AnyAsync(t => t.Teamid == dto.TeamId);
+                    if (!teamExists)
+                        return NotFound("TeamId does not exist");
+                }
 
                 participate.Teamid = dto.TeamId;
                 if (!string.IsNullOrWhiteSpace(dto.TagId))
