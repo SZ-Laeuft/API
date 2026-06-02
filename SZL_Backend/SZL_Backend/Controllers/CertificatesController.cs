@@ -36,18 +36,30 @@
                     var certificateData = await context.Participates
                         .AsNoTracking()
                         .Where(p => p.Eventid == eventId)
-                        .Select(p => new CertificateDataDto
+                        .Select(p => new
                         {
                             ParticipateId = p.Participateid,
                             EventName = p.Event != null ? p.Event.Name ?? string.Empty : string.Empty,
                             FirstName = p.Runner != null ? p.Runner.Firstname ?? string.Empty : string.Empty,
                             LastName = p.Runner != null ? p.Runner.Lastname ?? string.Empty : string.Empty,
+
                             RoundCount = p.Rounds.Count(r =>
                                 r.IsValid != null &&
                                 r.IsValid.ToLower() == "true"
-                            )
+                            ),
+
+                            LastValidRoundTime = p.Rounds
+                                .Where(r =>
+                                    r.IsValid != null &&
+                                    r.IsValid.ToLower() == "true" &&
+                                    r.Roundtime != null
+                                )
+                                .OrderByDescending(r => r.Roundtimestamp)
+                                .Select(r => (double?)r.Roundtime)
+                                .FirstOrDefault()
                         })
                         .OrderByDescending(p => p.RoundCount)
+                        .ThenBy(p => p.LastValidRoundTime ?? double.MaxValue)
                         .ThenBy(p => p.LastName)
                         .ThenBy(p => p.FirstName)
                         .ToListAsync();
