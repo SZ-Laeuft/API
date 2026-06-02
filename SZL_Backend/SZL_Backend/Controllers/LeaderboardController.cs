@@ -117,7 +117,8 @@ namespace SZL_Backend.Controllers
         {
             var query = context.Rounds
                 .Where(round =>
-                    round.IsValid == "true" &&
+                    round.IsValid != null &&
+                    EF.Functions.ILike(round.IsValid.Trim(), "true") &&
                     round.Roundtimestamp != null
                 )
                 .Join(
