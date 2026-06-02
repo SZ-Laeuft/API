@@ -8,6 +8,7 @@ using SZL_Backend.Entities;
 namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
+    [Route("api/participate")]
     [ApiController]
     public class ParticipatesController(SZLDbContext context) : ControllerBase
     {
@@ -166,11 +167,15 @@ namespace SZL_Backend.Controllers
         )]
         [ProducesResponseType(typeof(ParticipatesDto), 201)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> PostParticipate(ParticipatesCreateDto dto)
         {
-            if (dto.TeamId <= 0 || dto.EventId <= 0)
+            if (dto.TeamId is null or <= 0 || dto.EventId is null or <= 0)
                 return BadRequest("TeamId and EventId must be valid");
+
+            if (dto.RunnerId is <= 0)
+                return BadRequest("RunnerId must be greater than zero");
 
             if (string.IsNullOrWhiteSpace(dto.TagId))
                 return BadRequest("TagId is required");
@@ -180,6 +185,25 @@ namespace SZL_Backend.Controllers
 
             try
             {
+                var teamExists = await context.Teams.AnyAsync(t => t.Teamid == dto.TeamId);
+                if (!teamExists)
+                    return NotFound("TeamId does not exist");
+
+                var eventExists = await context.Events.AnyAsync(e => e.Eventid == dto.EventId);
+                if (!eventExists)
+                    return NotFound("EventId does not exist");
+
+                var tagExists = await context.Tags.AnyAsync(t => t.Tagid == tagId);
+                if (!tagExists)
+                    return NotFound("TagId does not exist");
+
+                if (dto.RunnerId is not null)
+                {
+                    var runnerExists = await context.Runners.AnyAsync(r => r.Runnerid == dto.RunnerId);
+                    if (!runnerExists)
+                        return NotFound("RunnerId does not exist");
+                }
+
                 var participate = new Participate
                 {
                     Teamid = dto.TeamId,
