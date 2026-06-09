@@ -23,7 +23,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await GetValidRoundsQuery()
+                var data = await context.Rounds
                     .Select(r => new RoundsDto
                     {
                         RoundId = r.Roundid,
@@ -56,7 +56,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var round = await GetValidRoundsQuery()
+                var round = await context.Rounds
                     .Where(r => r.Roundid == roundId)
                     .Select(r => new RoundsDto
                     {
@@ -92,7 +92,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var round = await GetValidRoundsQuery()
+                var round = await context.Rounds
                     .Where(r => r.Participateid == participateId)
                     .OrderByDescending(r => r.Roundid)
                     .Select(r => new RoundsDto
@@ -129,7 +129,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var rounds = await GetValidRoundsQuery()
+                var rounds = await context.Rounds
                     .Where(r => r.Participateid == participateId)
                     .CountAsync();
                 return Ok(rounds-1);
@@ -171,6 +171,7 @@ namespace SZL_Backend.Controllers
                     ParticipateId = round.Participateid,
                     RoundTimestamp = round.Roundtimestamp,
                     RoundTime = round.Roundtime,
+                    IsValid = round.IsValid,
                 };
 
                 return CreatedAtAction(nameof(GetRoundRoundId), new { roundId = round.Roundid }, result);
@@ -244,13 +245,5 @@ namespace SZL_Backend.Controllers
             }
         }
 
-        private IQueryable<Round> GetValidRoundsQuery()
-        {
-            return context.Rounds
-                .Where(r =>
-                    r.IsValid != null &&
-                    EF.Functions.ILike(r.IsValid.Trim(), "true")
-                );
-        }
     }
 }
