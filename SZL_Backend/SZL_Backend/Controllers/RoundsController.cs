@@ -23,7 +23,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var data = await context.Rounds
+                var data = await GetValidRoundsQuery()
                     .Select(r => new RoundsDto
                     {
                         RoundId = r.Roundid,
@@ -56,7 +56,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var round = await context.Rounds
+                var round = await GetValidRoundsQuery()
                     .Where(r => r.Roundid == roundId)
                     .Select(r => new RoundsDto
                     {
@@ -92,7 +92,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var round = await context.Rounds
+                var round = await GetValidRoundsQuery()
                     .Where(r => r.Participateid == participateId)
                     .OrderByDescending(r => r.Roundid)
                     .Select(r => new RoundsDto
@@ -129,7 +129,7 @@ namespace SZL_Backend.Controllers
         {
             try
             {
-                var rounds = await context.Rounds
+                var rounds = await GetValidRoundsQuery()
                     .Where(r => r.Participateid == participateId)
                     .CountAsync();
                 return Ok(rounds-1);
@@ -242,6 +242,15 @@ namespace SZL_Backend.Controllers
             {
                 return StatusCode(500);
             }
+        }
+
+        private IQueryable<Round> GetValidRoundsQuery()
+        {
+            return context.Rounds
+                .Where(r =>
+                    r.IsValid != null &&
+                    EF.Functions.ILike(r.IsValid.Trim(), "true")
+                );
         }
     }
 }
