@@ -116,6 +116,7 @@ namespace SZL_Backend.Controllers
             }
         }
         
+        
         // GET: api/rounds/5
         [HttpGet("get-round-count/{participateId}")]
         [SwaggerOperation(
@@ -131,6 +132,31 @@ namespace SZL_Backend.Controllers
             {
                 var rounds = await context.Rounds
                     .Where(r => r.Participateid == participateId)
+                    .CountAsync();
+                return Ok(rounds-1);
+            }
+            catch
+            {
+                return StatusCode(500);
+            }
+        }
+        
+        // GET: api/rounds/5
+        [HttpGet("get-round-count/is_valid/{participateId}")]
+        [SwaggerOperation(
+            Summary = "Get amount of rounds that are valid",
+            Description = "Retrieves amount of rounds by its unique ID."
+        )]
+        [ProducesResponseType(typeof(RoundsDto), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> GetAllValidRoundsParticipateId(int participateId)
+        {
+            try
+            {
+                var rounds = await context.Rounds
+                    .Where(r => r.Participateid == participateId)
+                    .Where(r => r.IsValid == "true")
                     .CountAsync();
                 return Ok(rounds-1);
             }

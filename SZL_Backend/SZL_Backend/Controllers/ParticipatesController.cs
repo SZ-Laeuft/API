@@ -8,7 +8,6 @@ using SZL_Backend.Entities;
 namespace SZL_Backend.Controllers
 {
     [Route("api/[controller]")]
-    [Route("api/participate")]
     [ApiController]
     public class ParticipatesController(SZLDbContext context) : ControllerBase
     {
