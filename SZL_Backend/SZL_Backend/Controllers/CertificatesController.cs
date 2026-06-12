@@ -58,10 +58,6 @@
                                 .Select(r => (double?)r.Roundtime)
                                 .FirstOrDefault()
                         })
-                        .OrderByDescending(p => p.RoundCount)
-                        .ThenBy(p => p.LastValidRoundTime ?? double.MaxValue)
-                        .ThenBy(p => p.LastName)
-                        .ThenBy(p => p.FirstName)
                         .ToListAsync();
 
                     if (certificateData.Count == 0)
@@ -72,6 +68,19 @@
                         });
 
                     var rankedCertificates = certificateData
+                        .Select(item => new
+                        {
+                            item.ParticipateId,
+                            item.EventName,
+                            item.FirstName,
+                            item.LastName,
+                            RoundCount = Math.Max(item.RoundCount - 1, 0),
+                            item.LastValidRoundTime
+                        })
+                        .OrderByDescending(item => item.RoundCount)
+                        .ThenBy(item => item.LastValidRoundTime ?? double.MaxValue)
+                        .ThenBy(item => item.LastName)
+                        .ThenBy(item => item.FirstName)
                         .Select((item, index) => new CertificatePdf
                         {
                             ParticipateId = item.ParticipateId,
