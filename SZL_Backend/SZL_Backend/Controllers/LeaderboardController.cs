@@ -168,7 +168,7 @@ namespace SZL_Backend.Controllers
                     Firstname = group.Key.Firstname,
                     Lastname = group.Key.Lastname,
                     Gender = group.Key.Gender,
-                    RoundCount = group.Count(),
+                    RoundCount = group.Count() - 1,
                     TotalRoundTime = group.Sum(x => x.round.Roundtime ?? 0),
                     ReachedAt = group.Max(x => x.round.Roundtimestamp)
                 })
